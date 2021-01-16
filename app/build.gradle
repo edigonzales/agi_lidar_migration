@@ -16,9 +16,12 @@ targetCompatibility = '11'
 
 dependencies {
     implementation 'org.codehaus.groovy:groovy-all:3.0.5'
-    compile("org.geoscript:geoscript-groovy:1.16.0")
-    compile group: 'org.gdal', name: 'gdal', version: '3.0.0'
-    compile group: 'org.orbisgis', name: 'h2gis', version: '1.5.0'
+    implementation 'org.geoscript:geoscript-groovy:1.16.0'
+    implementation 'org.gdal:gdal:3.0.0'
+    implementation 'org.orbisgis:h2gis:1.5.0'
+    implementation 'ch.interlis:ili2h2gis:4.4.5'
+    implementation 'ch.ehi:ehibasics:1.4.0' // Warum brauche ich das hier?
+    implementation 'net.lingala.zip4j:zip4j:2.6.4'
 
     testImplementation 'org.spockframework:spock-core:2.0-M4-groovy-3.0'
     testImplementation 'junit:junit:4.13'
