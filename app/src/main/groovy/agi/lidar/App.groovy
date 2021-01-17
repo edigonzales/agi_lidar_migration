@@ -30,15 +30,14 @@ def TEMPLATE_DB_FILE = Paths.get("../data/template_lidar_3D.mv.db").toFile().get
 def MODEL_NAME = "SO_AGI_Hoehenkurven_3D_Publikation_20210115"
 
 // Read (gdal) VRT file to get a list of all tif files.
-//def vrt = new groovy.xml.XmlParser().parse("../data/lidar_2014_dom_50cm.vrt")
-//def tiles = vrt.VRTRasterBand[0].SimpleSource.collect { it ->
-//    it.SourceFilename.text().reverse().drop(4).reverse()
-//}
-
+def vrt = new groovy.xml.XmlParser().parse("../data/lidar_2014_dom_50cm.vrt")
+def tiles = vrt.VRTRasterBand[0].SimpleSource.collect { it ->
+    it.SourceFilename.text().reverse().drop(4).reverse()
+}
 
 // 25941219_50cm
 //tiles = ["25941218_50cm", "25941219_50cm", "26041231_50cm"]
-tiles = ["26061232_50cm"]
+//tiles = ["26061232_50cm"]
 
 for (String tile : tiles) {
     println "Processing: $tile"
@@ -56,8 +55,7 @@ for (String tile : tiles) {
         def db = [url:"jdbc:h2:file:$dbFileName", user:'', password:'', driver:'org.h2.Driver']
 
         // TODO:
-        // - test with batch
-        // - use transaction
+        // - test with batch -> Kein signifikanter Unterschied.
         Sql.withInstance(db.url, db.user, db.password, db.driver) { sql ->
             contours.eachFeature { Feature feature ->
                 def elev = feature["elev"]
@@ -87,10 +85,7 @@ for (String tile : tiles) {
             }
         }
 
-        // Export XTF
-        // TODO:
-        // - ch.ehi.ili2db.base.Ili2dbException -> Ein Fehler soll die Berechnung des tiles abbrechen aber
-        // nicht den ganzen Prozess
+        //Export XTF
         Config settings = new Config();
         new H2gisMain().initConfig(settings);
         settings.setFunction(Config.FC_EXPORT)
