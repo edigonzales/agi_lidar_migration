@@ -22,10 +22,10 @@ import net.lingala.zip4j.ZipFile
 import java.util.stream.Collectors
 
 
-def DOWNLOAD_FOLDER = "/Volumes/Samsung_T5/geodata/ch.so.agi.lidar_2014.contour50cm/"
+def DOWNLOAD_FOLDER = "/media/stefan/Samsung_T5/geodata/ch.so.agi.lidar_2014.contour50cm/"
 def DOWNLOAD_URL = "https://geo.so.ch/geodata/ch.so.agi.lidar_2014.contour50cm/"
-def TEMP_FOLDER = "/Volumes/Samsung_T5/agi_lidar_migration/temp/"
-def XTF_FOLDER = "/Volumes/Samsung_T5/agi_lidar_migration/xtf/"
+def TEMP_FOLDER = "/media/stefan/Samsung_T5/agi_lidar_migration/temp/"
+def XTF_FOLDER = "/media/stefan/Samsung_T5/agi_lidar_migration/xtf/"
 def TEMPLATE_DB_FILE = Paths.get("../data/template_lidar_3D.mv.db").toFile().getAbsolutePath()
 def MODEL_NAME = "SO_AGI_Hoehenkurven_3D_Publikation_20210115"
 
