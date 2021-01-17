@@ -8,6 +8,7 @@ import ch.ehi.ili2db.base.Ili2dbException;
 import geoscript.feature.Feature
 import geoscript.geom.Geometry
 import geoscript.geom.LineString
+import geoscript.geom.Point
 import geoscript.layer.Shapefile
 import geoscript.workspace.Directory
 
@@ -18,13 +19,15 @@ import java.nio.file.Paths
 
 import net.lingala.zip4j.ZipFile
 
+import java.util.stream.Collectors
+
 
 def DOWNLOAD_FOLDER = "/Volumes/Samsung_T5/geodata/ch.so.agi.lidar_2014.contour50cm/"
 def DOWNLOAD_URL = "https://geo.so.ch/geodata/ch.so.agi.lidar_2014.contour50cm/"
 def TEMP_FOLDER = "/Volumes/Samsung_T5/agi_lidar_migration/temp/"
 def XTF_FOLDER = "/Volumes/Samsung_T5/agi_lidar_migration/xtf/"
-def TEMPLATE_DB_FILE = Paths.get("../data/template_lidar_2D.mv.db").toFile().getAbsolutePath()
-def MODEL_NAME = "SO_AGI_Hoehenkurven_2D_Publikation_20210115"
+def TEMPLATE_DB_FILE = Paths.get("../data/template_lidar_3D.mv.db").toFile().getAbsolutePath()
+def MODEL_NAME = "SO_AGI_Hoehenkurven_3D_Publikation_20210115"
 
 // Read (gdal) VRT file to get a list of all tif files.
 //def vrt = new groovy.xml.XmlParser().parse("../data/lidar_2014_dom_50cm.vrt")
@@ -34,8 +37,8 @@ def MODEL_NAME = "SO_AGI_Hoehenkurven_2D_Publikation_20210115"
 
 
 // 25941219_50cm
-tiles = ["25941218_50cm", "25941219_50cm", "26041231_50cm"]
-//tiles = ["26061232_50cm"]
+//tiles = ["25941218_50cm", "25941219_50cm", "26041231_50cm"]
+tiles = ["26061232_50cm"]
 
 for (String tile : tiles) {
     println "Processing: $tile"
@@ -61,15 +64,32 @@ for (String tile : tiles) {
             Geometry geom = feature.geom
             for (int i=0; i<geom.numGeometries; i++) {
                 def t_id = sql.firstRow("SELECT next value FOR t_ili2db_seq AS t_id").values().getAt(0)
-                LineString line = geom.getGeometryN(i)
-                def insertSql = "INSERT INTO hoehenkurve (t_id, kote, geometrie, jahr) VALUES ($t_id, $elev, ST_LineFromText($line.wkt), 2014)"
-                //println insertSql
-                sql.execute(insertSql)
+                LineString line = geom.getGeometryN(i).reducePrecision("fixed", scale: 1000)
+
+                // Z-Koordinate wird beim Erstellen des LineString ignoriert.
+                def coords = line.coordinates.collect() {it ->
+                        new Point(it.x, it.y)
+                    }
+
+                // Groovy .unique() ist sehr langsam.
+                def cleanedCoords = coords.stream()
+                        .distinct()
+                        .collect(Collectors.toList());
+
+                if (cleanedCoords.size() > 2) {
+                    LineString cleanedLine = new LineString(coords)
+                    //def insertSql = "INSERT INTO hoehenkurve (t_id, kote, geometrie, jahr) VALUES ($t_id, $elev, ST_LineFromText($cleanedLine.wkt), 2014)"
+                    def insertSql = "INSERT INTO hoehenkurve (t_id, kote, geometrie, jahr) VALUES ($t_id, $elev, ST_UpdateZ(ST_LineFromText($cleanedLine.wkt), $elev), 2014)"
+                    sql.execute(insertSql)
+                }
             }
         }
     }
 
     // Export XTF
+    // TODO:
+    // - ch.ehi.ili2db.base.Ili2dbException -> Ein Fehler soll die Berechnung des tiles abbrechen aber
+    // nicht den ganzen Prozess
     Config settings = new Config();
     new H2gisMain().initConfig(settings);
     settings.setFunction(Config.FC_EXPORT)
