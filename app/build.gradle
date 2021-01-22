@@ -20,6 +20,7 @@ dependencies {
     //implementation 'org.gdal:gdal:3.0.0'
     implementation 'org.orbisgis:h2gis:1.5.0'
     implementation 'ch.interlis:ili2h2gis:4.4.5'
+    implementation 'ch.interlis:ili2pg:4.4.5'
     implementation 'ch.ehi:ehibasics:1.4.0' // Warum brauche ich das hier?
     implementation 'net.lingala.zip4j:zip4j:2.6.4'
 
@@ -29,7 +30,7 @@ dependencies {
 
 
 application {
-    mainClass = 'agi.lidar.App'
+    mainClass = 'agi.lidar.Import'
 }
 
 applicationDefaultJvmArgs = ["-Djava.library.path=/usr/lib/jni/", "-Djava.awt.headless=true"]

@@ -1,0 +1,63 @@
+version: '3'
+services:
+  edit-db:
+    build: .
+    image: sogis/postgis-db:localbuild
+    environment:
+      PG_DATABASE: edit
+      PG_LOCALE: de_CH.UTF-8
+      PG_PRIMARY_PORT: 5432
+      PG_MODE: primary
+      PG_USER: admin
+      PG_PASSWORD: admin
+      PG_PRIMARY_USER: repl
+      PG_PRIMARY_PASSWORD: repl
+      PG_ROOT_PASSWORD: secret
+    ports:
+      - "54321:5432"
+    volumes:
+      - ./development_dbs/setup.sql:/pgconf/setup.sql
+      - sshd_edit:/sshd
+      - pgconf_edit:/pgconf
+      - pgdata_edit:/pgdata
+      - pgwal_edit:/pgwal
+      - recover_edit:/recover
+      - backrestrepo_edit:/backrestrepo
+    hostname: primary-edit
+  pub-db:
+    build: .
+    image: sogis/postgis-db:localbuild
+    environment:
+      PG_DATABASE: pub
+      PG_LOCALE: de_CH.UTF-8
+      PG_PRIMARY_PORT: 5432
+      PG_MODE: primary
+      PG_USER: admin
+      PG_PASSWORD: admin
+      PG_PRIMARY_USER: repl
+      PG_PRIMARY_PASSWORD: repl
+      PG_ROOT_PASSWORD: secret
+    ports:
+      - "54322:5432"
+    volumes:
+      - ./development_dbs/setup.sql:/pgconf/setup.sql
+      - sshd_pub:/sshd
+      - pgconf_pub:/pgconf
+      - pgdata_pub:/pgdata
+      - pgwal_pub:/pgwal
+      - recover_pub:/recover
+      - backrestrepo_pub:/backrestrepo
+    hostname: primary-pub
+volumes:
+  sshd_edit:
+  pgconf_edit:
+  pgdata_edit:
+  pgwal_edit:
+  recover_edit:
+  backrestrepo_edit:
+  sshd_pub:
+  pgconf_pub:
+  pgdata_pub:
+  pgwal_pub:
+  recover_pub:
+  backrestrepo_pub:
