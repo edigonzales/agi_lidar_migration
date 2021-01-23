@@ -23,6 +23,7 @@ def tiles = vrt.VRTRasterBand[0].SimpleSource.collect { it ->
     it.SourceFilename.text().reverse().drop(4).reverse()
 }
 
+int i=0
 for (String tile : tiles) {
     println "Processing: $tile"
 
@@ -52,7 +53,6 @@ for (String tile : tiles) {
         println e.getMessage()
     }
 
-
-    break
-
+    if (i>5) break
+    i++
 }

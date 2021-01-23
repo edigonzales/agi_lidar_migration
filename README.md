@@ -34,12 +34,17 @@ docker-compose up
 ```
 
 ```
-java -jar /Users/stefan/apps/ili2pg-4.4.5/ili2pg-4.4.5.jar --dbhost localhost --dbport 54321 --dbdatabase edit --dbusr admin --dbpwd admin --nameByTopic --strokeArcs --disableValidation --defaultSrsCode 2056 --createGeomIdx  --models SO_AGI_Hoehenkurven_3D_Publikation_20210115 --modeldir "model/;http://models.geo.admin.ch" --dbschema agi_hoehenkurven_2014 --schemaimport
+java -jar /Users/stefan/apps/ili2pg-4.4.5/ili2pg-4.4.5.jar --dbhost localhost --dbport 54321 --dbdatabase edit --dbusr admin --dbpwd admin --nameByTopic --strokeArcs --disableValidation --defaultSrsCode 2056 --createGeomIdx --models SO_AGI_Hoehenkurven_3D_Publikation_20210115 --modeldir "model/;http://models.geo.admin.ch" --dbschema agi_hoehenkurven_2014 --schemaimport
+```
+
+```
+java -jar /Users/stefan/apps/ili2pg-4.4.5/ili2pg-4.4.5.jar --dbhost localhost --dbport 54322 --dbdatabase pub --dbusr admin --dbpwd admin --nameByTopic --strokeArcs --disableValidation --defaultSrsCode 2056 --createGeomIdx --models SO_AGI_Hoehenkurven_3D_Publikation_20210115 --modeldir "model/;http://models.geo.admin.ch" --dbschema agi_hoehenkurven_2014_pub --schemaimport
 ```
 
 
 ```
-index index elev.
+CREATE INDEX hoehenkurven_hoehenkurve_elev_idx ON agi_hoehenkurven_2014.hoehenkurven_hoehenkurve USING btree (kote);
+
 
 ```
 

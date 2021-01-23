@@ -17,12 +17,12 @@ services:
       - "54321:5432"
     volumes:
       - ./development_dbs/setup.sql:/pgconf/setup.sql
-      - sshd_edit:/sshd
-      - pgconf_edit:/pgconf
-      - pgdata_edit:/pgdata
-      - pgwal_edit:/pgwal
-      - recover_edit:/recover
-      - backrestrepo_edit:/backrestrepo
+      - sshd_edit:/sshd:delegated
+      - pgconf_edit:/pgconf:delegated
+      - pgdata_edit:/pgdata:delegated
+      - pgwal_edit:/pgwal:delegated
+      - recover_edit:/recover:delegated
+      - backrestrepo_edit:/backrestrepo:delegated
     hostname: primary-edit
   pub-db:
     build: .
@@ -41,12 +41,12 @@ services:
       - "54322:5432"
     volumes:
       - ./development_dbs/setup.sql:/pgconf/setup.sql
-      - sshd_pub:/sshd
-      - pgconf_pub:/pgconf
-      - pgdata_pub:/pgdata
-      - pgwal_pub:/pgwal
-      - recover_pub:/recover
-      - backrestrepo_pub:/backrestrepo
+      - sshd_pub:/sshd:delegated
+      - pgconf_pub:/pgconf:delegated
+      - pgdata_pub:/pgdata:delegated
+      - pgwal_pub:/pgwal:delegated
+      - recover_pub:/recover:delegated
+      - backrestrepo_pub:/backrestrepo:delegated
     hostname: primary-pub
 volumes:
   sshd_edit:
