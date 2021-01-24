@@ -22,8 +22,8 @@ defaultTasks 'transfer'
 task transfer(type: Db2Db) {
     sourceDb = [dbUriEdit, dbUserEdit, dbPwdEdit]
     targetDb = [dbUriPub, dbUserPub, dbPwdPub]
-    batchSize = 500
-    fetchSize = 500
+    batchSize = 2000
+    fetchSize = 2000
     transferSets = [
         new TransferSet('transfer.sql', 'agi_hoehenkurven_2014_pub.hoehenkurven_hoehenkurve', true)
     ];

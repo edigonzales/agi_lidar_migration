@@ -87,7 +87,9 @@ export ORG_GRADLE_PROJECT_dbUserPub=admin
 export ORG_GRADLE_PROJECT_dbPwdPub=admin
 ```
 
-
+```
+gradle transfer -Dorg.gradle.jvmargs=-Xmx1G
+```
 
 ## Snippets
 
