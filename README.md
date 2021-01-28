@@ -23,6 +23,12 @@ java -jar /Users/stefan/apps/ili2gpkg-4.4.5/ili2gpkg-4.4.5.jar --dbfile fubar.gp
 ./gradlew app:run 2>&1 | tee lidar.log
 ```
 
+### ili2pg import with subdivide
+```
+java -jar /Users/stefan/apps/ili2pg-4.4.5/ili2pg-4.4.5.jar --dbhost localhost --dbport 54321 --dbdatabase edit --dbusr admin --dbpwd admin --nameByTopic --strokeArcs --disableValidation --defaultSrsCode 2056 --createGeomIdx --models SO_AGI_Hoehenkurven_3D_Publikation_20210115 --modeldir "model/;http://models.geo.admin.ch" --dbschema agi_hoehenkurven_2014_i --schemaimport
+java -jar /Users/stefan/apps/ili2pg-4.4.5/ili2pg-4.4.5.jar --dbhost localhost --dbport 54321 --dbdatabase edit --dbusr admin --dbpwd admin --nameByTopic --strokeArcs --disableValidation --defaultSrsCode 2056 --createGeomIdx --models SO_AGI_Hoehenkurven_3D_Publikation_20210115 --modeldir "model/;http://models.geo.admin.ch" --dbschema agi_hoehenkurven_2014_e --schemaimport
+```
+
 ## Import XTF
 
 ```

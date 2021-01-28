@@ -28,3 +28,4 @@ task transfer(type: Db2Db) {
         new TransferSet('transfer.sql', 'agi_hoehenkurven_2014_pub.hoehenkurven_hoehenkurve', true)
     ];
 }
+3
