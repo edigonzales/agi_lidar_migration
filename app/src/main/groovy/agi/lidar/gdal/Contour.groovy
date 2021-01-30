@@ -138,59 +138,48 @@ for (Feature feature: tindex.features) {
     Raster contourRaster = format.read()
 
     int band = 0
-    int interval = 1
+    int interval = 10
     boolean simplify = false
     boolean smooth = false
     Layer contours = contourRaster.contours(band, interval, simplify, smooth)
 
-    Workspace workspace = new Memory()
-    Layer clippedContours = workspace.create(contours.schema);
-    List<Feature> clippedFeatures = []
+//    Workspace workspace = new Memory()
+//    Layer clippedContours = workspace.create(contours.schema);
+//    List<Feature> clippedFeatures = []
 
     Bounds bounds = new Bounds(minX, minY, maxX, maxY, "EPSG:2056")
+    Workspace workspace = new Memory()
+    Layer boundsLayer = workspace.create(contours.schema);
+    Feature f = new Feature([
+            value: 1,
+            geom: bounds.geometry
+        ], "1", contours.schema)
+
+    boundsLayer.add(f)
+
     Schema schema = contours.schema
 
-    contours.eachFeature { Feature feat ->
-        Geometry clipped = feat.geom.intersection(bounds.geometry)
-
-        org.locationtech.jts.geom.Geometry g = clipped.g
-
-        Feature f = new Feature([
-            value: feat.get("value"),
-            geom: clipped
-        ], feat.id, schema)
-        clippedFeatures.add(f)
-    }
-
-    clippedContours.add(clippedFeatures)
-
-//    List<Feature> contoursFeatures = contours.features
-//    for(int i=0; i<contoursFeatures.size(); i++) {
-//        Feature f = contoursFeatures[i]
-//        Geometry clipped = f.geom.intersection(bounds.geometry)
+//    contours.eachFeature { Feature feat ->
+//        Geometry clipped = feat.geom.intersection(bounds.geometry)
 //
-//        contoursFeatures[i].setGeom(clipped)
+//        org.locationtech.jts.geom.Geometry g = clipped.g
 //
-////        println bounds.geometry
-////        println clipped.toString()
-////        println feat.geom.toString()
-//
-////        println clipped.equals(feat.geom)
-//
-////        break
-//
+//        Feature f = new Feature([
+//            value: feat.get("value"),
+//            geom: clipped
+//        ], feat.id, schema)
+//        clippedFeatures.add(f)
 //    }
-////    contours.update()
+//
+//    clippedContours.add(clippedFeatures)
 
 
+
+//    Workspace geopkg = new GeoPackage(Paths.get(TEMP_FOLDER, tile + ".gpkg").toFile())
+//    geopkg.add(clippedContours, tile)
+//    geopkg.close() //?
 
     println "hallo welt"
-
-
-    Workspace geopkg = new GeoPackage(Paths.get(TEMP_FOLDER, tile + ".gpkg").toFile())
-    geopkg.add(clippedContours, tile)
-    geopkg.close() //?
-
 
 
 }
