@@ -17,7 +17,7 @@ targetCompatibility = '11'
 dependencies {
     implementation 'org.codehaus.groovy:groovy-all:3.0.5'
     implementation 'org.geoscript:geoscript-groovy:1.16.0'
-    //implementation 'org.gdal:gdal:3.0.0'
+    implementation 'org.gdal:gdal:3.0.0'
     implementation 'org.orbisgis:h2gis:1.5.0'
     implementation 'ch.interlis:ili2h2gis:4.4.5'
     implementation 'ch.interlis:ili2pg:4.4.5'
@@ -30,7 +30,7 @@ dependencies {
 
 
 application {
-    mainClass = 'agi.lidar.AppPg'
+    mainClass = 'agi.lidar.gdal.Contour'
 }
 
 applicationDefaultJvmArgs = ["-Djava.library.path=/usr/lib/jni/", "-Djava.awt.headless=true"]
