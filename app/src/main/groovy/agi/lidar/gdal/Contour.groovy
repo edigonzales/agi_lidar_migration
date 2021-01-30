@@ -133,7 +133,7 @@ dest = mean(values);
     Raster contourRaster = format.read()
 
     int band = 0
-    int interval = 1
+    def interval = 0.5
     boolean simplify = false
     boolean smooth = false
     Layer contours = contourRaster.contours(band, interval, simplify, smooth)
