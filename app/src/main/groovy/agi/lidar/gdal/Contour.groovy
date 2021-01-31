@@ -68,12 +68,10 @@ for (Feature feature: tindex.features) {
         println maxX
         println maxY
 
-        def infile = Paths.get(TEMP_FOLDER, "input.tif").toFile().getAbsolutePath()
-        def outfile = Paths.get(TEMP_FOLDER, "output.tif").toFile().getAbsolutePath()
+        def infile = Paths.get(TEMP_FOLDER, "input0.tif").toFile().getAbsolutePath()
+        //def outfile = Paths.get(TEMP_FOLDER, "output.tif").toFile().getAbsolutePath()
 
         if (new File(infile).exists()) new File(infile).delete()
-    //    Dataset dataset = gdal.Open(VRT, gdalconstJNI.GA_ReadOnly_get());
-    //    Dataset[] datasetArray = dataset as Dataset[] // Java: {dataset}
 
         Vector<String> options = new Vector<>();
         options.add("-overwrite")
@@ -99,8 +97,10 @@ for (Feature feature: tindex.features) {
 
         5.times {
             println it
+            String n = it.toString()
+            String nplus = new Integer(it+1).toString()
 
-            File file = new File(infile)
+            File file = Paths.get(TEMP_FOLDER, "input"+n+".tif").toFile()
             Format format = Format.getFormat(file)
             Raster raster = format.read()
 
@@ -121,14 +121,23 @@ foreach (dy in -1:1) {
 dest = mean(values);
 """
             Raster output = algebra.calculate(script, [src:raster], outputName: "dest")
-            File outFile = new File(outfile)
+            File outFile = Paths.get(TEMP_FOLDER, "input"+nplus+".tif").toFile()
             Format outFormat = Format.getFormat(outFile)
             outFormat.write(output)
 
-            def src = new File(infile)
-            def dst = new File(outfile)
-            if (src.exists()) src.delete()
-            src << dst.bytes
+            // Dieser Ansatz gibt Probleme mit Jiffle resp. vielleicht
+            // liegt der Hung auch in meinem Code begraben.
+            // Jiffle motzt wegen des Images, das carbage collected
+            // wurde. Interessanterweise steht im JiffleBuilder-Code
+            // etwas dazu "Otherwise, the weak references get garbage collected too soon."
+            // Gefühlt scheint mir Java 8 anfälliger als Java 11 zu sein.
+            // Es passierte auch nie beim ersten Durchlauf / beim ersten Bild.
+            // Darum verdächtige ich schon noch das Rumkopieren.
+
+//            def src = new File(infile)
+//            def dst = new File(outfile)
+//            if (src.exists()) src.delete()
+//            src << dst.bytes
         }
 
         File file = new File(Paths.get(infile).toFile().getAbsolutePath())
