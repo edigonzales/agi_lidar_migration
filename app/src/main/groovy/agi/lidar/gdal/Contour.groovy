@@ -51,7 +51,7 @@ for (Feature feature: tindex.features) {
     String location = feature.get("location")
     String tile = location.reverse().substring(4,17).reverse()
 
-    if (tile != "26141236_50cm") continue
+    //if (tile != "26141236_50cm") continue
 
     def geom = feature.geom
     def env = geom.envelope
@@ -181,6 +181,8 @@ dest = mean(values);
     }
 
     clippedContours.add(clippedFeatures)
+
+    if (Paths.get(RESULT_FOLDER, tile + ".gpkg").toFile().exists()) Paths.get(RESULT_FOLDER, tile + ".gpkg").toFile().delete()
 
     Workspace geopkg = new GeoPackage(Paths.get(RESULT_FOLDER, tile + ".gpkg").toFile())
     geopkg.add(clippedContours, tile)

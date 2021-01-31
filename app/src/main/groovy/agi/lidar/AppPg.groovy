@@ -22,10 +22,10 @@ import net.lingala.zip4j.ZipFile
 import java.util.stream.Collectors
 
 
-def DOWNLOAD_FOLDER = "/Volumes/Samsung_T5/geodata/ch.so.agi.lidar_2014.contour50cm/"
+def DOWNLOAD_FOLDER = "//media/stefan/Samsung_T5/geodata/ch.so.agi.lidar_2014.contour50cm/"
 def DOWNLOAD_URL = "https://geo.so.ch/geodata/ch.so.agi.lidar_2014.contour50cm/"
-def TEMP_FOLDER = "/Volumes/Samsung_T5/agi_lidar_migration/temp/"
-def XTF_FOLDER = "/Volumes/Samsung_T5/agi_lidar_migration/xtf/"
+def TEMP_FOLDER = "//media/stefan/Samsung_T5/agi_lidar_migration/temp/"
+def XTF_FOLDER = "//media/stefan/Samsung_T5/agi_lidar_migration/xtf/"
 def TEMPLATE_DB_FILE = Paths.get("../data/template_lidar_3D.mv.db").toFile().getAbsolutePath()
 def MODEL_NAME = "SO_AGI_Hoehenkurven_3D_Publikation_20210115"
 
@@ -37,7 +37,7 @@ def tiles = vrt.VRTRasterBand[0].SimpleSource.collect { it ->
 
 // 25941219_50cm
 //tiles = ["25941218_50cm", "25941219_50cm", "26041231_50cm"]
-//tiles = ["26061232_50cm"]
+tiles = ["26141236_50cm"]
 
 for (String tile : tiles) {
     println "Processing: $tile"
@@ -153,9 +153,9 @@ INSERT INTO
         new ZipFile(xtfZipFileName.toFile().getAbsolutePath()).addFile(new File(xtfFileName))
 
         // Remove unnecessary files
-        new File(TEMP_FOLDER).eachFile (FileType.FILES) { file ->
-            if (file.name.contains('contour2014_') || file.name.contains("cm") || file.name.contains("tmp")) file.delete()
-        }
+//        new File(TEMP_FOLDER).eachFile (FileType.FILES) { file ->
+//            if (file.name.contains('contour2014_') || file.name.contains("cm") || file.name.contains("tmp")) file.delete()
+//        }
     } catch (Exception e) {
         e.printStackTrace()
         println e.getMessage()
