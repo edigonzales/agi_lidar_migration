@@ -38,6 +38,7 @@ println("Running against GDAL " + gdal.VersionInfo())
 def VRT = "/Volumes/Samsung_T5/geodata/ch.so.agi.lidar_2014.dtm/lidar_2014_dtm_50cm.vrt"
 def TINDEX = "/Volumes/Samsung_T5/geodata/ch.so.agi.lidar_2014.dtm/lidar_2014.shp"
 def DATA_FOLDER = "/Volumes/Samsung_T5/geodata/ch.so.agi.lidar_2014.dtm/"
+def RESULT_FOLDER = "/Volumes/Samsung_T5/geodata/ch.so.agi.lidar_2014.contour50cm_gpkg/"
 def TEMP_FOLDER = "/Volumes/Samsung_T5/tmp/"
 def BUFFER = 50
 
@@ -181,7 +182,7 @@ dest = mean(values);
 
     clippedContours.add(clippedFeatures)
 
-    Workspace geopkg = new GeoPackage(Paths.get(TEMP_FOLDER, tile + ".gpkg").toFile())
+    Workspace geopkg = new GeoPackage(Paths.get(RESULT_FOLDER, tile + ".gpkg").toFile())
     geopkg.add(clippedContours, tile)
     geopkg.close()
 
