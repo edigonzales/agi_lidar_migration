@@ -95,10 +95,15 @@ for (Feature feature: tindex.features) {
         options.add("TILED=TRUE");
         gdal.Warp(Paths.get(infile).toFile().getAbsolutePath(), datasetArray, new WarpOptions(options))
 
-        5.times {
-            println it
-            String n = it.toString()
-            String nplus = new Integer(it+1).toString()
+        for (int i=0; i<5; i++) {
+        //5.times {
+            //println it
+            //String n = it.toString()
+            //String nplus = new Integer(it+1).toString()
+
+            println i
+            String n = i as String
+            String nplus = new Integer(i+1).toString()
 
             File file = Paths.get(TEMP_FOLDER, "input"+n+".tif").toFile()
             Format format = Format.getFormat(file)
@@ -120,19 +125,24 @@ foreach (dy in -1:1) {
 
 dest = mean(values);
 """
+            println "********" + raster.coverage.renderedImage
+
             Raster output = algebra.calculate(script, [src:raster], outputName: "dest")
             File outFile = Paths.get(TEMP_FOLDER, "input"+nplus+".tif").toFile()
             Format outFormat = Format.getFormat(outFile)
             outFormat.write(output)
 
             // Dieser Ansatz gibt Probleme mit Jiffle resp. vielleicht
-            // liegt der Hung auch in meinem Code begraben.
+            // liegt der Hund auch in meinem Code begraben.
             // Jiffle motzt wegen des Images, das carbage collected
             // wurde. Interessanterweise steht im JiffleBuilder-Code
             // etwas dazu "Otherwise, the weak references get garbage collected too soon."
             // Gefühlt scheint mir Java 8 anfälliger als Java 11 zu sein.
             // Es passierte auch nie beim ersten Durchlauf / beim ersten Bild.
             // Darum verdächtige ich schon noch das Rumkopieren.
+
+            // -> Hilft auch nix. Zuerst siehts gut aus, dann häufen sich
+            // die Fehler.
 
 //            def src = new File(infile)
 //            def dst = new File(outfile)
