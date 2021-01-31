@@ -143,6 +143,7 @@ dest = mean(values);
 
             // -> Hilft auch nix. Zuerst siehts gut aus, dann häufen sich
             // die Fehler.
+            // Umgestellt von 5.times{} nach for()
 
 //            def src = new File(infile)
 //            def dst = new File(outfile)
