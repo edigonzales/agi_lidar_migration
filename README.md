@@ -23,7 +23,7 @@ java -jar /Users/stefan/apps/ili2gpkg-4.4.5/ili2gpkg-4.4.5.jar --dbfile fubar.gp
 
 ### Run and log
 ```
-./gradlew -Dorg.gradle.jvmargs=-Xmx4G app:run 2>&1 | tee lidar.log
+./gradlew -Dorg.gradle.jvmargs=-Xmx2G app:run 2>&1 | tee lidar.log
 ```
 
 ### ili2pg import with subdivide

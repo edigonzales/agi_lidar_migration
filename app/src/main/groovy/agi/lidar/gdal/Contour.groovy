@@ -26,7 +26,10 @@ import org.gdal.gdal.VectorTranslateOptions
 import org.gdal.gdal.TranslateOptions
 import org.gdal.gdalconst.gdalconstJNI
 import org.geotools.geometry.jts.GeometryClipper
+import org.locationtech.jts.geom.GeometryCollection
 import org.locationtech.jts.operation.overlay.OverlayOp
+
+import net.lingala.zip4j.ZipFile
 
 import java.nio.file.Paths
 import java.util.Vector
@@ -53,7 +56,7 @@ for (Feature feature: tindex.features) {
         String tile = location.reverse().substring(4,17).reverse()
 
         if (Paths.get(RESULT_FOLDER, tile + ".gpkg").toFile().exists()) continue
-        //if (tile != "26141236_50cm") continue
+        //if (tile != "26221239_50cm") continue
 
         def geom = feature.geom
         def env = geom.envelope
@@ -69,7 +72,7 @@ for (Feature feature: tindex.features) {
         println maxY
 
         def infile = Paths.get(TEMP_FOLDER, "input0.tif").toFile().getAbsolutePath()
-        //def outfile = Paths.get(TEMP_FOLDER, "output.tif").toFile().getAbsolutePath()
+        def outfile = Paths.get(TEMP_FOLDER, "input5.tif").toFile().getAbsolutePath()
 
         if (new File(infile).exists()) new File(infile).delete()
 
@@ -145,13 +148,14 @@ dest = mean(values);
             // die Fehler.
             // Umgestellt von 5.times{} nach for()
 
+
 //            def src = new File(infile)
 //            def dst = new File(outfile)
 //            if (src.exists()) src.delete()
 //            src << dst.bytes
         }
 
-        File file = new File(Paths.get(infile).toFile().getAbsolutePath())
+        File file = new File(Paths.get(outfile).toFile().getAbsolutePath())
         Format format = Format.getFormat(file)
         Raster contourRaster = format.read()
 
@@ -192,6 +196,32 @@ dest = mean(values);
                     ], uuid, schema)
                     clippedFeatures.add(f)
                 }
+            } else if (cg instanceof org.locationtech.jts.geom.Point) {
+                // do nothing
+            } else if (cg instanceof org.locationtech.jts.geom.GeometryCollection) {
+                org.locationtech.jts.geom.GeometryCollection collection = (org.locationtech.jts.geom.GeometryCollection) cg
+                for (int k=0; k<collection.numGeometries; k++) {
+                    org.locationtech.jts.geom.Geometry g = collection.getGeometryN(k)
+                    if (g instanceof org.locationtech.jts.geom.LineString) {
+                        org.locationtech.jts.geom.LineString lineString = (org.locationtech.jts.geom.LineString) g
+                        def uuid = UUID.randomUUID().toString()
+                        Feature f = new Feature([
+                                value: feat.get("value"),
+                                geom: new LineString(lineString)
+                        ], uuid, schema)
+                        clippedFeatures.add(f)
+                    } else if (g instanceof org.locationtech.jts.geom.MultiLineString) {
+                        for (int l=0; l<g.numGeometries; l++) {
+                            org.locationtech.jts.geom.LineString lineString = (org.locationtech.jts.geom.LineString) g.getGeometryN(l)
+                            def uuid = UUID.randomUUID().toString()
+                            Feature f = new Feature([
+                                    value: feat.get("value"),
+                                    geom: new LineString(lineString)
+                            ], uuid, schema)
+                            clippedFeatures.add(f)
+                        }
+                    }
+                }
             } else {
                 def uuid = UUID.randomUUID().toString()
                 Feature f = new Feature([
@@ -204,11 +234,16 @@ dest = mean(values);
 
         clippedContours.add(clippedFeatures)
 
-        if (Paths.get(RESULT_FOLDER, tile + ".gpkg").toFile().exists()) Paths.get(RESULT_FOLDER, tile + ".gpkg").toFile().delete()
+        File resultFile = Paths.get(RESULT_FOLDER, tile + ".gpkg").toFile()
 
-        Workspace geopkg = new GeoPackage(Paths.get(RESULT_FOLDER, tile + ".gpkg").toFile())
+        if (resultFile.exists()) resultFile.delete()
+
+        Workspace geopkg = new GeoPackage(resultFile)
         geopkg.add(clippedContours, tile)
         geopkg.close()
+
+        String zipFileName =
+        new ZipFile(Paths.get(RESULT_FOLDER, tile + ".zip").toFile().getAbsolutePath()).addFile(resultFile)
     } catch (Exception e) {
         e.printStackTrace()
         System.err.println(e.getMessage())
