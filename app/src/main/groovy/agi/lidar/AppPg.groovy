@@ -9,9 +9,10 @@ import geoscript.feature.Feature
 import geoscript.geom.Geometry
 import geoscript.geom.LineString
 import geoscript.geom.Point
+import geoscript.layer.Layer
 import geoscript.layer.Shapefile
 import geoscript.workspace.Directory
-
+import geoscript.workspace.GeoPackage
 import groovy.sql.Sql
 import groovy.io.FileType
 
@@ -24,8 +25,9 @@ import java.util.stream.Collectors
 
 def DOWNLOAD_FOLDER = "//media/stefan/Samsung_T5/geodata/ch.so.agi.lidar_2014.contour50cm/"
 def DOWNLOAD_URL = "https://geo.so.ch/geodata/ch.so.agi.lidar_2014.contour50cm/"
-def TEMP_FOLDER = "//media/stefan/Samsung_T5/agi_lidar_migration/temp/"
-def XTF_FOLDER = "//media/stefan/Samsung_T5/agi_lidar_migration/xtf/"
+def DATA_FOLDER = "/media/stefan/Samsung_T5/geodata/ch.so.agi.lidar_2014.contour50cm_gpkg/"
+def TEMP_FOLDER = "/media/stefan/Samsung_T5/agi_lidar_migration/temp/"
+def XTF_FOLDER = "/media/stefan/Samsung_T5/agi_lidar_migration/xtf/"
 def TEMPLATE_DB_FILE = Paths.get("../data/template_lidar_3D.mv.db").toFile().getAbsolutePath()
 def MODEL_NAME = "SO_AGI_Hoehenkurven_3D_Publikation_20210115"
 
@@ -37,16 +39,21 @@ def tiles = vrt.VRTRasterBand[0].SimpleSource.collect { it ->
 
 // 25941219_50cm
 //tiles = ["25941218_50cm", "25941219_50cm", "26041231_50cm"]
-tiles = ["26141236_50cm"]
+tiles = ["25941218_50cm"]
 
 for (String tile : tiles) {
     println "Processing: $tile"
 
     try {
-        new ZipFile(Paths.get(DOWNLOAD_FOLDER, tile + ".zip").toFile().getAbsolutePath()).extractAll(TEMP_FOLDER);
+        //new ZipFile(Paths.get(DOWNLOAD_FOLDER, tile + ".zip").toFile().getAbsolutePath()).extractAll(TEMP_FOLDER);
 
         // Read features from Shapefile and insert contours into h2gis database.
-        Shapefile contours = new Shapefile(Paths.get(TEMP_FOLDER, "contour2014_" + tile + ".shp").toFile().getAbsolutePath())
+        //Shapefile contours = new Shapefile(Paths.get(TEMP_FOLDER, "contour2014_" + tile + ".shp").toFile().getAbsolutePath())
+        GeoPackage workspace = new GeoPackage(Paths.get(DATA_FOLDER, tile + ".gpkg").toFile().getAbsolutePath())
+        println Paths.get(DATA_FOLDER, tile + ".gpkg").toFile().getAbsolutePath()
+        println workspace.layers
+        Layer contours = workspace.get(tile)
+        println contours.schema
         println "# Features in Contours = ${contours.count}"
 
         def dbFileName = Paths.get(TEMP_FOLDER, tile + ".mv.db").toFile().getAbsolutePath()
@@ -56,27 +63,39 @@ for (String tile : tiles) {
 
         Sql.withInstance(h2.url, h2.user, h2.password, h2.driver) { sql ->
             contours.eachFeature { Feature feature ->
-                def elev = feature["elev"]
-                Geometry geom = feature.geom
-                for (int i=0; i<geom.numGeometries; i++) {
-                    def t_id = sql.firstRow("SELECT next value FOR t_ili2db_seq AS t_id").values().getAt(0)
-                    LineString line = geom.getGeometryN(i).reducePrecision("fixed", scale: 1000)
+                //println feature.toString()
+                def elev = feature["value"]
+                Geometry geom = feature.the_geom
+                if (geom != null) {
+                    for (int i=0; i<geom.numGeometries; i++) {
+                        def t_id = sql.firstRow("SELECT next value FOR t_ili2db_seq AS t_id").values().getAt(0)
+                        LineString line = geom.getGeometryN(i).reducePrecision("fixed", scale: 1000)
 
-                    // Z-Koordinate wird beim Erstellen des LineString ignoriert.
-                    def coords = line.coordinates.collect() {it ->
-                        new Point(it.x, it.y)
-                    }
+                        // Z-Koordinate wird beim Erstellen des LineString ignoriert.
+                        def coords = line.coordinates.collect() {it ->
+                            new Point(it.x, it.y)
+                        }
 
-                    // Groovy .unique() ist sehr langsam.
-                    def cleanedCoords = coords.stream()
-                            .distinct()
-                            .collect(Collectors.toList());
+                        // Groovy .unique() ist sehr langsam.
+                        def cleanedCoords = coords.stream()
+                                .distinct()
+                                .collect(Collectors.toList());
 
-                    if (cleanedCoords.size() > 2) {
-                        LineString cleanedLine = new LineString(coords)
-                        //def insertSql = "INSERT INTO hoehenkurve (t_id, kote, geometrie, jahr) VALUES ($t_id, $elev, ST_LineFromText($cleanedLine.wkt), 2014)"
-                        def insertSql = "INSERT INTO hoehenkurve (t_id, kote, geometrie, jahr) VALUES ($t_id, $elev, ST_UpdateZ(ST_LineFromText($cleanedLine.wkt), $elev), 2014)"
-                        sql.execute(insertSql)
+                        if (cleanedCoords.size() > 2) {
+                            LineString cleanedLine = new LineString(coords)
+
+                            Point startPoint = cleanedLine.getStartPoint()
+                            Point endPoint = cleanedLine.getEndPoint()
+
+                            if ((startPoint.getX() == endPoint.getX()) ||
+                                startPoint.getY() == endPoint.getY()) {
+                                continue
+                            }
+
+                            //def insertSql = "INSERT INTO hoehenkurve (t_id, kote, geometrie, jahr) VALUES ($t_id, $elev, ST_LineFromText($cleanedLine.wkt), 2014)"
+                            def insertSql = "INSERT INTO hoehenkurve (t_id, kote, geometrie, jahr) VALUES ($t_id, $elev, ST_UpdateZ(ST_LineFromText($cleanedLine.wkt), $elev), 2014)"
+                            sql.execute(insertSql)
+                        }
                     }
                 }
             }
@@ -135,7 +154,7 @@ INSERT INTO
     FROM agi_hoehenkurven_2014_i.hoehenkurven_hoehenkurve
 ;
 """)
-            sql.execute("DELETE FROM agi_hoehenkurven_2014_i.hoehenkurven_hoehenkurve;")
+            //sql.execute("DELETE FROM agi_hoehenkurven_2014_i.hoehenkurven_hoehenkurve;")
         }
 
         // Export subdivided XTF
@@ -146,7 +165,7 @@ INSERT INTO
         Ili2db.run(settingsPg, null);
 
         Sql.withInstance(pg.url, pg.user, pg.password, pg.driver) { sql ->
-            sql.execute("DELETE FROM agi_hoehenkurven_2014_e.hoehenkurven_hoehenkurve;")
+            //sql.execute("DELETE FROM agi_hoehenkurven_2014_e.hoehenkurven_hoehenkurve;")
         }
 
         def xtfZipFileName = Paths.get(XTF_FOLDER, tile + ".zip")

@@ -30,7 +30,7 @@ dependencies {
 
 
 application {
-    mainClass = 'agi.lidar.gdal.Contour'
+    mainClass = 'agi.lidar.AppPg'
 }
 
 applicationDefaultJvmArgs = ["-Djava.library.path=/usr/lib/jni/", "-Djava.awt.headless=true"]

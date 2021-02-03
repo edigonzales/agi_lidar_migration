@@ -41,6 +41,7 @@ println("Running against GDAL " + gdal.VersionInfo())
 def VRT = "/Volumes/Samsung_T5/geodata/ch.so.agi.lidar_2014.dtm/lidar_2014_dtm_50cm.vrt"
 def TINDEX = "/Volumes/Samsung_T5/geodata/ch.so.agi.lidar_2014.dtm/lidar_2014.shp"
 def DATA_FOLDER = "/Volumes/Samsung_T5/geodata/ch.so.agi.lidar_2014.dtm/"
+//def RESULT_FOLDER = "/Volumes/Samsung_T5/geodata/ch.so.agi.lidar_2014.contour50cm_gpkg/"
 def RESULT_FOLDER = "/Volumes/Samsung_T5/geodata/ch.so.agi.lidar_2014.contour50cm_gpkg/"
 def TEMP_FOLDER = "/Volumes/Samsung_T5/tmp/"
 def BUFFER = 50
@@ -57,6 +58,8 @@ for (Feature feature: tindex.features) {
 
         if (Paths.get(RESULT_FOLDER, tile + ".gpkg").toFile().exists()) continue
         //if (tile != "26221239_50cm") continue
+        //if (tile != "25941218_50cm") continue
+
 
         def geom = feature.geom
         def env = geom.envelope
@@ -122,6 +125,7 @@ options { outside = null; }
 values = [];
 foreach (dy in -1:1) {
   foreach (dx in -1:1) {
+  
       values << src[dx, dy];
   }
 }
