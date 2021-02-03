@@ -40,15 +40,19 @@ println("Running against GDAL " + gdal.VersionInfo())
 
 def VRT = "/Volumes/Samsung_T5/geodata/ch.so.agi.lidar_2014.dtm/lidar_2014_dtm_50cm.vrt"
 def TINDEX = "/Volumes/Samsung_T5/geodata/ch.so.agi.lidar_2014.dtm/lidar_2014.shp"
+def PERIMETER = "/Volumes/Samsung_T5/geodata/ch.so.agi.lidar_2014.dtm/lidar_2014_dissolved.gpkg"
 def DATA_FOLDER = "/Volumes/Samsung_T5/geodata/ch.so.agi.lidar_2014.dtm/"
 //def RESULT_FOLDER = "/Volumes/Samsung_T5/geodata/ch.so.agi.lidar_2014.contour50cm_gpkg/"
-def RESULT_FOLDER = "/Volumes/Samsung_T5/geodata/ch.so.agi.lidar_2014.contour50cm_gpkg/"
+def RESULT_FOLDER = "/Volumes/Samsung_T5/geodata/test/"
 def TEMP_FOLDER = "/Volumes/Samsung_T5/tmp/"
 def BUFFER = 50
 
 Dataset vrtDataset = gdal.Open(VRT, gdalconstJNI.GA_ReadOnly_get())
 Dataset[] datasetArray = vrtDataset as Dataset[] // Java: {dataset}
 
+GeoPackage perimeterWs = new GeoPackage(new File(PERIMETER))
+println perimeterWs.layers
+Layer perimeter = perimeterWs.get("lidar_2014_dissolved")
 Shapefile tindex = new Shapefile(TINDEX)
 
 for (Feature feature: tindex.features) {
@@ -56,9 +60,9 @@ for (Feature feature: tindex.features) {
         String location = feature.get("location")
         String tile = location.reverse().substring(4,17).reverse()
 
-        if (Paths.get(RESULT_FOLDER, tile + ".gpkg").toFile().exists()) continue
+        //if (Paths.get(RESULT_FOLDER, tile + ".gpkg").toFile().exists()) continue
         //if (tile != "26221239_50cm") continue
-        //if (tile != "25941218_50cm") continue
+        if (tile != "25941218_50cm") continue
 
 
         def geom = feature.geom
@@ -184,11 +188,12 @@ dest = mean(values);
             // ist, weiss ich nicht. Jedenfalls das Auseinanderpfrimeln
             // braucht es.
 
-            // Ist garantiert, dass ein contour-Geometrie immer
-            // ein LineString ist?
             org.locationtech.jts.geom.LineString fg = feat.geom.g
+            org.locationtech.jts.geom.MultiPolygon kg = perimeter.features.get(0).geom.g
             org.locationtech.jts.geom.Polygon bg = bounds.geometry.g
-            org.locationtech.jts.geom.Geometry cg = OverlayOp.overlayOp(fg, bg, OverlayOp.INTERSECTION)
+
+            org.locationtech.jts.geom.Geometry cg_tmp = OverlayOp.overlayOp(fg, kg, OverlayOp.INTERSECTION)
+            org.locationtech.jts.geom.Geometry cg = OverlayOp.overlayOp(cg_tmp, bg, OverlayOp.INTERSECTION)
 
             if (cg instanceof org.locationtech.jts.geom.MultiLineString) {
                 for (int j=0; j<cg.numGeometries; j++) {

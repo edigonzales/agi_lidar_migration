@@ -154,7 +154,7 @@ INSERT INTO
     FROM agi_hoehenkurven_2014_i.hoehenkurven_hoehenkurve
 ;
 """)
-            //sql.execute("DELETE FROM agi_hoehenkurven_2014_i.hoehenkurven_hoehenkurve;")
+            sql.execute("DELETE FROM agi_hoehenkurven_2014_i.hoehenkurven_hoehenkurve;")
         }
 
         // Export subdivided XTF
@@ -165,7 +165,7 @@ INSERT INTO
         Ili2db.run(settingsPg, null);
 
         Sql.withInstance(pg.url, pg.user, pg.password, pg.driver) { sql ->
-            //sql.execute("DELETE FROM agi_hoehenkurven_2014_e.hoehenkurven_hoehenkurve;")
+            sql.execute("DELETE FROM agi_hoehenkurven_2014_e.hoehenkurven_hoehenkurve;")
         }
 
         def xtfZipFileName = Paths.get(XTF_FOLDER, tile + ".zip")
