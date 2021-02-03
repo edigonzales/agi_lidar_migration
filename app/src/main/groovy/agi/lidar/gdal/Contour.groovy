@@ -60,9 +60,9 @@ for (Feature feature: tindex.features) {
         String location = feature.get("location")
         String tile = location.reverse().substring(4,17).reverse()
 
-        //if (Paths.get(RESULT_FOLDER, tile + ".gpkg").toFile().exists()) continue
+        if (Paths.get(RESULT_FOLDER, tile + ".gpkg").toFile().exists()) continue
         //if (tile != "26221239_50cm") continue
-        if (tile != "25941218_50cm") continue
+        //if (tile != "25941218_50cm") continue
 
 
         def geom = feature.geom
@@ -251,7 +251,6 @@ dest = mean(values);
         geopkg.add(clippedContours, tile)
         geopkg.close()
 
-        String zipFileName =
         new ZipFile(Paths.get(RESULT_FOLDER, tile + ".zip").toFile().getAbsolutePath()).addFile(resultFile)
     } catch (Exception e) {
         e.printStackTrace()
