@@ -42,8 +42,8 @@ def VRT = "/Volumes/Samsung_T5/geodata/ch.so.agi.lidar_2014.dtm/lidar_2014_dtm_5
 def TINDEX = "/Volumes/Samsung_T5/geodata/ch.so.agi.lidar_2014.dtm/lidar_2014.shp"
 def PERIMETER = "/Volumes/Samsung_T5/geodata/ch.so.agi.lidar_2014.dtm/lidar_2014_dissolved.gpkg"
 def DATA_FOLDER = "/Volumes/Samsung_T5/geodata/ch.so.agi.lidar_2014.dtm/"
-//def RESULT_FOLDER = "/Volumes/Samsung_T5/geodata/ch.so.agi.lidar_2014.contour50cm_gpkg/"
-def RESULT_FOLDER = "/Volumes/Samsung_T5/geodata/test/"
+def RESULT_FOLDER = "/Volumes/Samsung_T5/geodata/ch.so.agi.lidar_2014.contour50cm_gpkg/"
+//def RESULT_FOLDER = "/Volumes/Samsung_T5/geodata/test/"
 def TEMP_FOLDER = "/Volumes/Samsung_T5/tmp/"
 def BUFFER = 50
 
