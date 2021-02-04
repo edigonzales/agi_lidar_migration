@@ -39,7 +39,7 @@ def tiles = vrt.VRTRasterBand[0].SimpleSource.collect { it ->
 
 // 25941219_50cm
 //tiles = ["25941218_50cm", "25941219_50cm", "26041231_50cm"]
-tiles = ["25941218_50cm"]
+//tiles = ["25941218_50cm"]
 
 for (String tile : tiles) {
     println "Processing: $tile"
@@ -53,7 +53,7 @@ for (String tile : tiles) {
         //println Paths.get(TEMP_FOLDER, tile + ".gpkg").toFile().getAbsolutePath()
         //println workspace.layers
         Layer contours = workspace.get(tile)
-        println contours.schema
+        //println contours.schema
         println "# Features in Contours = ${contours.count}"
 
         def dbFileName = Paths.get(TEMP_FOLDER, tile + ".mv.db").toFile().getAbsolutePath()
