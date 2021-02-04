@@ -175,6 +175,8 @@ INSERT INTO
         new File(TEMP_FOLDER).eachFile (FileType.FILES) { file ->
             if (file.name.contains("_50cm"))  file.delete()
         }
+
+        workspace.close()
     } catch (Exception e) {
         e.printStackTrace()
         println e.getMessage()
