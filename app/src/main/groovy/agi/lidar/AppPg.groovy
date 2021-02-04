@@ -45,13 +45,13 @@ for (String tile : tiles) {
     println "Processing: $tile"
 
     try {
-        //new ZipFile(Paths.get(DOWNLOAD_FOLDER, tile + ".zip").toFile().getAbsolutePath()).extractAll(TEMP_FOLDER);
+        new ZipFile(Paths.get(DATA_FOLDER, tile + ".zip").toFile().getAbsolutePath()).extractAll(TEMP_FOLDER);
 
         // Read features from Shapefile and insert contours into h2gis database.
         //Shapefile contours = new Shapefile(Paths.get(TEMP_FOLDER, "contour2014_" + tile + ".shp").toFile().getAbsolutePath())
-        GeoPackage workspace = new GeoPackage(Paths.get(DATA_FOLDER, tile + ".gpkg").toFile().getAbsolutePath())
-        println Paths.get(DATA_FOLDER, tile + ".gpkg").toFile().getAbsolutePath()
-        println workspace.layers
+        GeoPackage workspace = new GeoPackage(Paths.get(TEMP_FOLDER, tile + ".gpkg").toFile().getAbsolutePath())
+        //println Paths.get(TEMP_FOLDER, tile + ".gpkg").toFile().getAbsolutePath()
+        //println workspace.layers
         Layer contours = workspace.get(tile)
         println contours.schema
         println "# Features in Contours = ${contours.count}"
@@ -172,9 +172,9 @@ INSERT INTO
         new ZipFile(xtfZipFileName.toFile().getAbsolutePath()).addFile(new File(xtfFileName))
 
         // Remove unnecessary files
-//        new File(TEMP_FOLDER).eachFile (FileType.FILES) { file ->
-//            if (file.name.contains('contour2014_') || file.name.contains("cm") || file.name.contains("tmp")) file.delete()
-//        }
+        new File(TEMP_FOLDER).eachFile (FileType.FILES) { file ->
+            if (file.name.contains("_50cm"))  file.delete()
+        }
     } catch (Exception e) {
         e.printStackTrace()
         println e.getMessage()

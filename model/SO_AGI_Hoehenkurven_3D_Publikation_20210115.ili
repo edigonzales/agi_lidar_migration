@@ -6,7 +6,7 @@ INTERLIS 2.3;
  *  !! 2021-01-15 | sz  | Ersterfassung
  *  !!==============================================================================
  */
-!!@ technicalContact="mailto:agi@bd.so.ch"
+!!@ technicalContact=mailto:agi@bd.so.ch
 MODEL SO_AGI_Hoehenkurven_3D_Publikation_20210115 (de)
 AT "http://geo.so.ch/models/AGI"
 VERSION "2021-01-15"  =
@@ -15,7 +15,7 @@ VERSION "2021-01-15"  =
   TOPIC Hoehenkurven =
 
     CLASS Hoehenkurve =
-      Kote : MANDATORY 200.0 .. 1500.0;
+      Kote : MANDATORY -200.0 .. 5000.0;
       Geometrie : MANDATORY GeometryCHLV95_V1.LineWithAltitude;
       Jahr : INTERLIS.GregorianYear;
     END Hoehenkurve;
