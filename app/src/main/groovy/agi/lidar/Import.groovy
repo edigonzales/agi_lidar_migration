@@ -14,7 +14,8 @@ import java.util.stream.Collectors
 import net.lingala.zip4j.ZipFile
 
 //def XTF_FOLDER = "/media/stefan/Samsung_T5/agi_lidar_migration/xtf/"
-def XTF_FOLDER = "/Volumes/Samsung_T5/agi_lidar_migration/xtf/"
+def XTF_FOLDER = "/home/stefan/Samsung_T5/tmp/xtf/"
+//def XTF_FOLDER = "/Volumes/Samsung_T5/agi_lidar_migration/xtf/"
 def MODEL_NAME = "SO_AGI_Hoehenkurven_3D_Publikation_20210115"
 
 // Read (gdal) VRT file to get a list of all xtf files.
@@ -28,7 +29,6 @@ for (String tile : tiles) {
     println "Processing: $tile"
 
     try {
-        //Export XTF
         Config settings = new Config();
         new PgMain().initConfig(settings);
         settings.setFunction(Config.FC_IMPORT)
@@ -53,6 +53,6 @@ for (String tile : tiles) {
         println e.getMessage()
     }
 
-    if (i>5) break
+    //if (i>0) break
     i++
 }
