@@ -14,7 +14,7 @@ import java.util.stream.Collectors
 import net.lingala.zip4j.ZipFile
 
 //def XTF_FOLDER = "/media/stefan/Samsung_T5/agi_lidar_migration/xtf/"
-def XTF_FOLDER = "/home/stefan/Samsung_T5/tmp/xtf/"
+def XTF_FOLDER = "/home/stefan/tmp/xtf/"
 //def XTF_FOLDER = "/Volumes/Samsung_T5/agi_lidar_migration/xtf/"
 def MODEL_NAME = "SO_AGI_Hoehenkurven_3D_Publikation_20210115"
 
