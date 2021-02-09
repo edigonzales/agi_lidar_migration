@@ -33,7 +33,7 @@ Vagrant.configure("2") do |config|
 
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
-  # config.vm.network "private_network", ip: "192.168.33.10"
+  config.vm.network "private_network", ip: "192.168.33.10"
 
   config.vm.network "forwarded_port", guest: 22, host: 2020, id: 'ssh'
   config.ssh.forward_agent = true
@@ -49,7 +49,7 @@ Vagrant.configure("2") do |config|
   # the path on the guest to mount the folder. And the optional third
   # argument is a set of non-required options.
   # config.vm.synced_folder "../data", "/vagrant_data"
-  #config.vm.synced_folder "/Volumes/Samsung_T5/", "/Volumes/Samsung_T5/"
+  config.vm.synced_folder "/Volumes/Samsung_T5/", "/Volumes/Samsung_T5/"
   #config.vm.synced_folder "/media/stefan/Samsung_T5/", "/Volumes/Samsung_T5/"
 
   # Provider-specific configuration so you can fine-tune various

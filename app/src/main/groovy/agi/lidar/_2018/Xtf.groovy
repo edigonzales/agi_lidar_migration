@@ -1,4 +1,4 @@
-package agi.lidar
+package agi.lidar._2018
 
 import ch.ehi.ili2db.gui.Config
 import ch.ehi.ili2h2gis.H2gisMain
@@ -23,23 +23,21 @@ import net.lingala.zip4j.ZipFile
 import java.util.stream.Collectors
 
 
-def DOWNLOAD_FOLDER = "//media/stefan/Samsung_T5/geodata/ch.so.agi.lidar_2014.contour50cm/"
-def DOWNLOAD_URL = "https://geo.so.ch/geodata/ch.so.agi.lidar_2014.contour50cm/"
-def DATA_FOLDER = "/media/stefan/Samsung_T5/geodata/ch.so.agi.lidar_2014.contour50cm_gpkg/"
-def TEMP_FOLDER = "/media/stefan/Samsung_T5/agi_lidar_migration/temp/"
-def XTF_FOLDER = "/media/stefan/Samsung_T5/agi_lidar_migration/xtf/"
+def DATA_FOLDER = "/Volumes/Samsung_T5/geodata/ch.bl.agi.lidar_2018.contour50cm_gpkg/"
+def TEMP_FOLDER = "/Volumes/Samsung_T5/agi_lidar_migration/2018/temp/"
+def XTF_FOLDER = "/Volumes/Samsung_T5/agi_lidar_migration/2018/xtf/"
 def TEMPLATE_DB_FILE = Paths.get("../data/template_lidar_3D.mv.db").toFile().getAbsolutePath()
 def MODEL_NAME = "SO_AGI_Hoehenkurven_3D_Publikation_20210115"
 
 // Read (gdal) VRT file to get a list of all tif files.
-def vrt = new groovy.xml.XmlParser().parse("../data/lidar_2014_dom_50cm.vrt")
-def tiles = vrt.VRTRasterBand[0].SimpleSource.collect { it ->
+def vrt = new groovy.xml.XmlParser().parse("../data/2018/dtm.vrt")
+def tiles = vrt.VRTRasterBand[0].ComplexSource.collect { it ->
     it.SourceFilename.text().reverse().drop(4).reverse()
 }
 
 // 25941219_50cm
 //tiles = ["25941218_50cm", "25941219_50cm", "26041231_50cm"]
-//tiles = ["25941218_50cm"]
+tiles = ["2590500_1254000"]
 
 for (String tile : tiles) {
     println "Processing: $tile"
@@ -47,11 +45,9 @@ for (String tile : tiles) {
     try {
         new ZipFile(Paths.get(DATA_FOLDER, tile + ".zip").toFile().getAbsolutePath()).extractAll(TEMP_FOLDER);
 
-        // Read features from Shapefile and insert contours into h2gis database.
-        //Shapefile contours = new Shapefile(Paths.get(TEMP_FOLDER, "contour2014_" + tile + ".shp").toFile().getAbsolutePath())
+        // Read features from Geopackage and insert contours into h2gis database.
         GeoPackage workspace = new GeoPackage(Paths.get(TEMP_FOLDER, tile + ".gpkg").toFile().getAbsolutePath())
-        //println Paths.get(TEMP_FOLDER, tile + ".gpkg").toFile().getAbsolutePath()
-        //println workspace.layers
+        println workspace.layers
         Layer contours = workspace.get(tile)
         //println contours.schema
         println "# Features in Contours = ${contours.count}"
@@ -87,7 +83,6 @@ for (String tile : tiles) {
                             Point startPoint = cleanedLine.getStartPoint()
                             Point endPoint = cleanedLine.getEndPoint()
 
-                            // Mist.... nochmals rechnen.
 //                            if ((startPoint.getX() == endPoint.getX()) ||
 //                                startPoint.getY() == endPoint.getY()) {
 //                                continue
@@ -117,14 +112,14 @@ for (String tile : tiles) {
         Ili2db.run(settingsH2, null);
 
         // Import XTF to subdivide
-        def pg = [url:"jdbc:postgresql://localhost:54321/edit", user:'admin', password:'admin', driver:'org.postgresql.Driver']
+        def pg = [url:"jdbc:postgresql://192.168.33.1:54321/edit", user:'admin', password:'admin', driver:'org.postgresql.Driver']
 
         Config settingsPg = new Config();
         new PgMain().initConfig(settingsPg);
         settingsPg.setFunction(Config.FC_IMPORT)
         settingsPg.setModels(MODEL_NAME)
         settingsPg.setModeldir(Paths.get("../model").toFile().getAbsolutePath()+";"+"http://models.geo.admin.ch")
-        settingsPg.setDbhost("localhost")
+        settingsPg.setDbhost("192.168.33.1")
         settingsPg.setDbport("54321")
         settingsPg.setDbdatabase("edit")
         settingsPg.setDbschema("agi_hoehenkurven_2014_i")
@@ -174,7 +169,7 @@ INSERT INTO
 
         // Remove unnecessary files
         new File(TEMP_FOLDER).eachFile (FileType.FILES) { file ->
-            if (file.name.contains("_50cm"))  file.delete()
+            if (file.name.contains("00"))  file.delete()
         }
 
         workspace.close()
@@ -182,4 +177,6 @@ INSERT INTO
         e.printStackTrace()
         println e.getMessage()
     }
+
+    break
 }
