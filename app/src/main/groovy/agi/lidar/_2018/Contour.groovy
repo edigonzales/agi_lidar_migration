@@ -262,7 +262,6 @@ dest = mean(values);
     }
     println "hallo welt"
 
-    break
 }
 
 vrtDataset.delete()

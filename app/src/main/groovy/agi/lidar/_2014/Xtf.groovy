@@ -1,4 +1,4 @@
-package agi.lidar._2018
+package agi.lidar._2014
 
 import ch.ehi.ili2db.gui.Config
 import ch.ehi.ili2h2gis.H2gisMain
@@ -23,21 +23,19 @@ import net.lingala.zip4j.ZipFile
 import java.util.stream.Collectors
 
 
-def DATA_FOLDER = "/Volumes/Samsung_T5/geodata/ch.bl.agi.lidar_2018.contour50cm_gpkg/"
-def TEMP_FOLDER = "/Volumes/Samsung_T5/agi_lidar_migration/2018/temp/"
-def XTF_FOLDER = "/Volumes/Samsung_T5/agi_lidar_migration/2018/xtf/"
+def DATA_FOLDER = "/Volumes/Samsung_T5/geodata/ch.so.agi.lidar_2014.contour50cm_gpkg/"
+def TEMP_FOLDER = "/Volumes/Samsung_T5/agi_lidar_migration/2014/temp/"
+def XTF_FOLDER = "/Volumes/Samsung_T5/agi_lidar_migration/2014/xtf/"
 def TEMPLATE_DB_FILE = Paths.get("../data/template_lidar_3D.mv.db").toFile().getAbsolutePath()
 def MODEL_NAME = "SO_AGI_Hoehenkurven_3D_Publikation_20210115"
 
 // Read (gdal) VRT file to get a list of all tif files.
-def vrt = new groovy.xml.XmlParser().parse("../data/2018/dtm.vrt")
-def tiles = vrt.VRTRasterBand[0].ComplexSource.collect { it ->
+def vrt = new groovy.xml.XmlParser().parse("../data/2014/lidar_2014_dom_50cm.vrt")
+def tiles = vrt.VRTRasterBand[0].SimpleSource.collect { it ->
     it.SourceFilename.text().reverse().drop(4).reverse()
 }
 
-// 25941219_50cm
-//tiles = ["25941218_50cm", "25941219_50cm", "26041231_50cm"]
-tiles = ["2590500_1254000"]
+//tiles = ["25941218_50cm"]
 
 for (String tile : tiles) {
     println "Processing: $tile"
@@ -165,6 +163,7 @@ INSERT INTO
         }
 
         workspace.close()
+
     } catch (Exception e) {
         e.printStackTrace()
         println e.getMessage()
