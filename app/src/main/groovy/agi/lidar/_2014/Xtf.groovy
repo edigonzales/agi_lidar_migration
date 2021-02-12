@@ -40,6 +40,8 @@ def tiles = vrt.VRTRasterBand[0].SimpleSource.collect { it ->
 for (String tile : tiles) {
     println "Processing: $tile"
 
+    if (Paths.get(XTF_FOLDER, tile + ".xtf").toFile().exists()) continue
+
     try {
         new ZipFile(Paths.get(DATA_FOLDER, tile + ".zip").toFile().getAbsolutePath()).extractAll(TEMP_FOLDER);
 
@@ -159,7 +161,11 @@ INSERT INTO
 
         // Remove unnecessary files
         new File(TEMP_FOLDER).eachFile (FileType.FILES) { file ->
-            if (file.name.contains("00"))  file.delete()
+            println file.name
+            if (file.name.contains("_5"))  {
+                println "delete: " + file.name
+                file.delete()
+            }
         }
 
         workspace.close()
