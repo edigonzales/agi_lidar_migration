@@ -37,10 +37,12 @@ def tiles = vrt.VRTRasterBand[0].ComplexSource.collect { it ->
 
 // 25941219_50cm
 //tiles = ["25941218_50cm", "25941219_50cm", "26041231_50cm"]
-tiles = ["2590500_1254000"]
+//tiles = ["2590500_1254000"]
 
 for (String tile : tiles) {
     println "Processing: $tile"
+
+    if (Paths.get(XTF_FOLDER, tile + ".xtf").toFile().exists()) continue
 
     try {
         new ZipFile(Paths.get(DATA_FOLDER, tile + ".zip").toFile().getAbsolutePath()).extractAll(TEMP_FOLDER);
