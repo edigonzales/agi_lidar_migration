@@ -6,7 +6,7 @@ plugins {
 repositories {
     mavenLocal()
     maven { url "https://repo.osgeo.org/repository/release/" }
-    maven { url "http://jars.interlis.ch" }
+    maven { url "http://jars.interlis.ch"; allowInsecureProtocol true }
     mavenCentral()
     jcenter()
 }

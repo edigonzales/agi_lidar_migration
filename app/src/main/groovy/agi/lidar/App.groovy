@@ -87,7 +87,7 @@ for (String tile : tiles) {
 
         //Export XTF
         Config settings = new Config();
-        new H2gisMain().initConfig(settings);
+        new H2gisMain().initConfig(settings)
         settings.setFunction(Config.FC_EXPORT)
         settings.setModels(MODEL_NAME)
         settings.setModeldir(Paths.get("..").toFile().getAbsolutePath()+";"+"http://models.geo.admin.ch")
