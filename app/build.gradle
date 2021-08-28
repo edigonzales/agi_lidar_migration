@@ -8,15 +8,16 @@ repositories {
     maven { url "https://repo.osgeo.org/repository/release/" }
     maven { url "http://jars.interlis.ch"; allowInsecureProtocol true }
     mavenCentral()
-    jcenter()
 }
 
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
 dependencies {
-    implementation 'org.codehaus.groovy:groovy-all:3.0.5'
-    implementation 'org.geoscript:geoscript-groovy:1.16.0'
+    implementation 'org.codehaus.groovy:groovy-all:3.0.8'
+    implementation 'org.geoscript:geoscript-groovy:1.18-SNAPSHOT'
+    //implementation 'org.codehaus.groovy:groovy-all:3.0.5'
+    //implementation 'org.geoscript:geoscript-groovy:1.16.0'
     implementation 'org.gdal:gdal:3.0.0'
     implementation 'org.orbisgis:h2gis:1.5.0'
     implementation 'ch.interlis:ili2h2gis:4.4.5'
@@ -33,10 +34,13 @@ application {
     //mainClass = 'agi.lidar.gdal.Contour'
     //mainClass = 'agi.lidar.AppPg'
     //mainClass = 'agi.lidar.Import'
+    //mainClass = 'agi.lidar._2014.Download'
+    mainClass = 'agi.lidar._2014.Contour'
     //mainClass = 'agi.lidar._2014.Xtf'
     //mainClass = 'agi.lidar._2018.Download'
     //mainClass = 'agi.lidar._2018.Contour'
-    mainClass = 'agi.lidar._2018.Xtf'
+    //mainClass = 'agi.lidar._2018.Xtf'
 }
 
-applicationDefaultJvmArgs = ["-Djava.library.path=/usr/lib/jni/", "-Djava.awt.headless=true"]
+//applicationDefaultJvmArgs = ["-Djava.library.path=/usr/lib/jni/", "-Djava.awt.headless=true"]
+applicationDefaultJvmArgs = ["-Djava.awt.headless=true"]

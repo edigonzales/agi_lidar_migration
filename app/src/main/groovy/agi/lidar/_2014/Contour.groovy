@@ -1,13 +1,9 @@
-package agi.lidar._2018
+package agi.lidar._2014
 
 import geoscript.feature.Feature
 import geoscript.feature.Schema
 import geoscript.geom.Bounds
-import geoscript.geom.Geometry
 import geoscript.geom.LineString
-import geoscript.geom.MultiLineString
-import geoscript.geom.MultiPolygon
-import geoscript.geom.Point
 import geoscript.layer.Format
 import geoscript.layer.Layer
 import geoscript.layer.MapAlgebra
@@ -16,56 +12,31 @@ import geoscript.layer.Shapefile
 import geoscript.workspace.GeoPackage
 import geoscript.workspace.Memory
 import geoscript.workspace.Workspace
-import org.gdal.gdal.Dataset
-import org.gdal.gdal.WarpOptions
-import org.gdal.gdal.gdal
-import org.gdal.gdalconst.gdalconstJNI
-import org.gdal.gdal.gdal
-import org.gdal.gdal.Dataset
-import org.gdal.gdal.VectorTranslateOptions
-import org.gdal.gdal.TranslateOptions
-import org.gdal.gdalconst.gdalconstJNI
-import org.geotools.geometry.jts.GeometryClipper
-import org.locationtech.jts.geom.GeometryCollection
+import net.lingala.zip4j.ZipFile
 import org.locationtech.jts.operation.overlay.OverlayOp
 
-import net.lingala.zip4j.ZipFile
-
 import java.nio.file.Paths
-import java.util.Vector
 
-gdal.AllRegister()
-gdal.UseExceptions()
-println("Running against GDAL " + gdal.VersionInfo())
+import static groovy.io.FileType.FILES
 
-def VRT = "/Volumes/Samsung_T5/geodata/ch.bl.agi.lidar_2018.dtm/dtm.vrt"
-def TINDEX = "../data/2018/tindex.shp"
-def PERIMETER = "../data/2018/perimeter.gpkg"
-def DATA_FOLDER = "/Volumes/Samsung_T5/geodata/ch.bl.agi.lidar_2018.dtm/"
-def RESULT_FOLDER = "/Volumes/Samsung_T5/geodata/ch.bl.agi.lidar_2018.contour50cm_gpkg/"
-//def RESULT_FOLDER = "/Volumes/Samsung_T5/geodata/test/"
-def TEMP_FOLDER = "/Volumes/Samsung_T5/tmp/"
+def PERIMETER = "../data/2014/perimeter.gpkg"
+def TINDEX = "../data/2014/tindex.shp"
+def DATA_FOLDER = "/Users/stefan/tmp/geodata/ch.so.agi.lidar_2014.dtm/"
+def RESULT_FOLDER = "/Users/stefan/tmp/geodata/ch.so.agi.lidar_2014.dtm_gpkg_tmp/"
+def TEMP_FOLDER = "/Users/stefan/tmp/geodata/tmp/"
 def BUFFER = 50
-
-Dataset vrtDataset = gdal.Open(VRT, gdalconstJNI.GA_ReadOnly_get())
-Dataset[] datasetArray = vrtDataset as Dataset[] // Java: {dataset}
 
 GeoPackage perimeterWs = new GeoPackage(new File(PERIMETER))
 println perimeterWs.layers
-Layer perimeter = perimeterWs.get("perimeter lidar_2014_dissolved")
+Layer perimeter = perimeterWs.get("lidar_2014_dissolved")
 Shapefile tindex = new Shapefile(TINDEX)
 
 for (Feature feature: tindex.features) {
     try {
         String location = feature.get("location")
-        String tile = location.reverse().substring(4,19).reverse()
+        String tile = location.reverse().substring(4, 17).reverse()
 
         println "Processing: ${tile}"
-
-        if (Paths.get(RESULT_FOLDER, tile + ".gpkg").toFile().exists()) continue
-        //if (tile != "26221239_50cm") continue
-        //if (tile != "25941218_50cm") continue
-
 
         def geom = feature.geom
         def env = geom.envelope
@@ -75,40 +46,42 @@ for (Feature feature: tindex.features) {
         def maxX = env.getMaxX() as int
         def maxY = env.getMaxY() as int
 
-        println minX
-        println minY
-        println maxX
-        println maxY
+        int easting = tile.substring(0,4) as Integer
+        int northing = tile.substring(4,8) as Integer
 
+        //println easting + " " + northing
+
+        List<Raster> rasters = []
+        for (int i=-1; i<=1; i++) {
+            for (int j=-1; j<=1; j++) {
+                println "----------"
+
+                String neighbourTile = (easting + i) as String + (northing + j) as String + "_50cm.tif"
+                if (neighbourTile.equalsIgnoreCase(tile)) continue
+
+                println neighbourTile
+                File file = new File(DATA_FOLDER + neighbourTile)
+                if (!file.exists()) continue
+                Format format = Format.getFormat(file)
+                Raster raster = format.read()
+                rasters.add(raster)
+            }
+        }
+        Raster mosaicedRaster = Raster.mosaic(rasters)
+        Raster croppedRaster = mosaicedRaster.crop(new Bounds(minX - BUFFER,minY - BUFFER,maxX + BUFFER,maxY + BUFFER, "EPSG:2056"))
+
+        File outFile = new File(TEMP_FOLDER + "input0.tif")
+        Format outFormat = Format.getFormat(outFile)
+        outFormat.write(croppedRaster)
+
+        // Das geht code-mässig eleganter (z.B. nicht hardcodierter outfile Name etc.).
+        // Jedoch führte das mit Jiffle zu Problemem "Otherwise, the weak references get garbage collected too soon".
+        // Kann natürlich auch an meinem Code gelegen haben.
         def infile = Paths.get(TEMP_FOLDER, "input0.tif").toFile().getAbsolutePath()
         def outfile = Paths.get(TEMP_FOLDER, "input5.tif").toFile().getAbsolutePath()
 
-        if (new File(infile).exists()) new File(infile).delete()
-
-        Vector<String> options = new Vector<>();
-        options.add("-overwrite")
-        options.add("-s_srs")
-        options.add("epsg:2056")
-        options.add("-t_srs")
-        options.add("epsg:2056")
-        options.add("-te")
-        options.add(new Integer(minX - BUFFER).toString())
-        options.add(new Integer(minY - BUFFER).toString())
-        options.add(new Integer(maxX + BUFFER).toString())
-        options.add(new Integer(maxY + BUFFER).toString())
-        options.add("-tr")
-        options.add("0.5")
-        options.add("0.5")
-        options.add("-wo")
-        options.add("NUM_THREADS=ALL_CPUS")
-        options.add("-r")
-        options.add("bilinear");
-        options.add("-co");
-        options.add("TILED=TRUE");
-        gdal.Warp(Paths.get(infile).toFile().getAbsolutePath(), datasetArray, new WarpOptions(options))
-
         for (int i=0; i<5; i++) {
-        //5.times {
+            //5.times {
             //println it
             //String n = it.toString()
             //String nplus = new Integer(it+1).toString()
@@ -140,37 +113,19 @@ dest = mean(values);
 """
             println "********" + raster.coverage.renderedImage
 
-            Raster output = algebra.calculate(script, [src:raster], outputName: "dest")
-            File outFile = Paths.get(TEMP_FOLDER, "input"+nplus+".tif").toFile()
-            Format outFormat = Format.getFormat(outFile)
-            outFormat.write(output)
-
-            // Dieser Ansatz gibt Probleme mit Jiffle resp. vielleicht
-            // liegt der Hund auch in meinem Code begraben.
-            // Jiffle motzt wegen des Images, das carbage collected
-            // wurde. Interessanterweise steht im JiffleBuilder-Code
-            // etwas dazu "Otherwise, the weak references get garbage collected too soon."
-            // Gefühlt scheint mir Java 8 anfälliger als Java 11 zu sein.
-            // Es passierte auch nie beim ersten Durchlauf / beim ersten Bild.
-            // Darum verdächtige ich schon noch das Rumkopieren.
-
-            // -> Hilft auch nix. Zuerst siehts gut aus, dann häufen sich
-            // die Fehler.
-            // Umgestellt von 5.times{} nach for()
-
-
-//            def src = new File(infile)
-//            def dst = new File(outfile)
-//            if (src.exists()) src.delete()
-//            src << dst.bytes
+            Raster outputSmooth = algebra.calculate(script, [src:raster], outputName: "dest")
+            File outFileSmooth = Paths.get(TEMP_FOLDER, "input"+nplus+".tif").toFile()
+            Format outFormatSmooth = Format.getFormat(outFileSmooth)
+            outFormatSmooth.write(outputSmooth)
         }
 
+        // 3. Höhenkurven
         File file = new File(Paths.get(outfile).toFile().getAbsolutePath())
         Format format = Format.getFormat(file)
         Raster contourRaster = format.read()
 
         int band = 0
-        def interval = 0.5
+        def interval = 1.0
         boolean simplify = false
         boolean smooth = false
         Layer contours = contourRaster.contours(band, interval, simplify, smooth)
@@ -249,7 +204,7 @@ dest = mean(values);
 
         File resultFile = Paths.get(RESULT_FOLDER, tile + ".gpkg").toFile()
 
-        if (resultFile.exists()) resultFile.delete()
+        //if (resultFile.exists()) resultFile.delete()
 
         Workspace geopkg = new GeoPackage(resultFile)
         geopkg.add(clippedContours, tile)
@@ -260,8 +215,6 @@ dest = mean(values);
         e.printStackTrace()
         System.err.println(e.getMessage())
     }
-    println "hallo welt"
+    break
 
 }
-
-vrtDataset.delete()
