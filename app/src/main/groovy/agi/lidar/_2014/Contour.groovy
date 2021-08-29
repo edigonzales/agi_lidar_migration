@@ -82,7 +82,7 @@ for (Feature feature: tindex.features) {
         outFormat.write(croppedRaster)
 
         // Das geht code-mässig eleganter (z.B. nicht hardcodierter outfile Name etc.).
-        // Jedoch führte das mit Jiffle zu Problemem "Otherwise, the weak references get garbage collected too soon".
+        // Jedoch führte das mit Jiffle zu Problemen "Otherwise, the weak references get garbage collected too soon".
         // Kann natürlich auch an meinem Code gelegen haben.
         def infile = Paths.get(TEMP_FOLDER, "input0.tif").toFile().getAbsolutePath()
         def outfile = Paths.get(TEMP_FOLDER, "input5.tif").toFile().getAbsolutePath()
