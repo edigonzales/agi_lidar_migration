@@ -38,6 +38,13 @@ for (Feature feature: tindex.features) {
 
         println "Processing: ${tile}"
 
+        File resultFile = Paths.get(RESULT_FOLDER, tile + ".gpkg").toFile()
+        if (resultFile.exists()) {
+            println "skipping... "
+            continue
+        }
+        //if (resultFile.exists()) resultFile.delete()
+
         def geom = feature.geom
         def env = geom.envelope
 
@@ -202,10 +209,6 @@ dest = mean(values);
 
         clippedContours.add(clippedFeatures)
 
-        File resultFile = Paths.get(RESULT_FOLDER, tile + ".gpkg").toFile()
-
-        //if (resultFile.exists()) resultFile.delete()
-
         Workspace geopkg = new GeoPackage(resultFile)
         geopkg.add(clippedContours, tile)
         geopkg.close()
@@ -215,6 +218,5 @@ dest = mean(values);
         e.printStackTrace()
         System.err.println(e.getMessage())
     }
-    break
-
+    //break
 }

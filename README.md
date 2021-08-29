@@ -1,5 +1,10 @@
 # agi_lidar_migration
 
+## TODO
+- Dokumentation: Perimeterrand ist kleiner, damit die unschönen Randartefakte verschwinden.
+- Problem: 25931226_50cm.gpkg. Höhenkurve x-fach vorhanden (tid=1353ff, value=684)
+
+
 ## Links
 - https://github.com/edigonzales-archiv/av_lidar_produkte/blob/master/contour/contour.py
 
