@@ -189,6 +189,7 @@ dest = mean(values);
 
             println("Höhe: " + feat.get("value"))
             int hoehe = feat.get("value")
+            /*
             if (hoehe == 682) {
                 println ("--------------------")
                 println feat.geom.getClass()
@@ -197,6 +198,7 @@ dest = mean(values);
                 println feat.geom.getGeometryType()
                 println feat.geom.toString()
             }
+             */
 
             org.locationtech.jts.geom.LineString fg = feat.geom.g
             org.locationtech.jts.geom.MultiPolygon kg = perimeter.features.get(0).geom.g
@@ -205,10 +207,12 @@ dest = mean(values);
             org.locationtech.jts.geom.Geometry cg_tmp = OverlayOp.overlayOp(fg, kg, OverlayOp.INTERSECTION)
             org.locationtech.jts.geom.Geometry cg = OverlayOp.overlayOp(cg_tmp, bg, OverlayOp.INTERSECTION)
 
+            /*
             if (hoehe == 682) {
                 println cg_tmp.getGeometryType()
                 println cg.getGeometryType()
             }
+             */
 
 
 
