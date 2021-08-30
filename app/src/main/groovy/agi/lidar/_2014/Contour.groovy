@@ -19,16 +19,19 @@ import java.nio.file.Paths
 
 import static groovy.io.FileType.FILES
 
-def PERIMETER = "../data/2014/perimeter.gpkg"
+def PERIMETER = "../data/2014/perimeter2.gpkg"
 def TINDEX = "../data/2014/tindex.shp"
 def DATA_FOLDER = "/Users/stefan/tmp/geodata/ch.so.agi.lidar_2014.dtm/"
 def RESULT_FOLDER = "/Users/stefan/tmp/geodata/ch.so.agi.lidar_2014.dtm_gpkg_tmp/"
 def TEMP_FOLDER = "/Users/stefan/tmp/geodata/tmp/"
 def BUFFER = 50
+def BOUNDARY_BUFFER = 5
 
 GeoPackage perimeterWs = new GeoPackage(new File(PERIMETER))
 println perimeterWs.layers
-Layer perimeter = perimeterWs.get("lidar_2014_dissolved")
+//Layer perimeter = perimeterWs.get("lidar_2014_dissolved")
+println perimeterWs.layers
+Layer perimeter = perimeterWs.get("perimeter2")
 Shapefile tindex = new Shapefile(TINDEX)
 
 for (Feature feature: tindex.features) {
@@ -36,26 +39,37 @@ for (Feature feature: tindex.features) {
         String location = feature.get("location")
         String tile = location.reverse().substring(4, 17).reverse()
 
+        if (!tile.equalsIgnoreCase("25931226_50cm")) {
+            continue;
+        }
+
         println "Processing: ${tile}"
 
         File resultFile = Paths.get(RESULT_FOLDER, tile + ".gpkg").toFile()
+        /*
         if (resultFile.exists()) {
             println "skipping... "
             continue
         }
+        */
+
         //if (resultFile.exists()) resultFile.delete()
 
         def geom = feature.geom
         def env = geom.envelope
 
-        def minX = env.getMinX() as int
-        def minY = env.getMinY() as int
-        def maxX = env.getMaxX() as int
-        def maxY = env.getMaxY() as int
+        def minX = env.getMinX() as int - BUFFER
+        def minY = env.getMinY() as int - BUFFER
+        def maxX = env.getMaxX() as int + BUFFER
+        def maxY = env.getMaxY() as int + BUFFER
 
         int easting = tile.substring(0,4) as Integer
         int northing = tile.substring(4,8) as Integer
 
+        int minXBufferFix = 0
+        int maxXBufferFix = 0
+        int minYBufferFix = 0
+        int maxYBufferFix = 0
         //println easting + " " + northing
 
         List<Raster> rasters = []
@@ -66,16 +80,35 @@ for (Feature feature: tindex.features) {
                 String neighbourTile = (easting + i) as String + (northing + j) as String + "_50cm.tif"
                 if (neighbourTile.equalsIgnoreCase(tile)) continue
 
-                println neighbourTile
+                //println neighbourTile
                 File file = new File(DATA_FOLDER + neighbourTile)
-                if (!file.exists()) continue
+                // Achtung: Abhängig von den vorhandenen Daten im Verzeichnis.
+                // Und nicht etwa von einer Tileindex-Datei oder ähnlich.
+                if (!file.exists()) {
+                    println "tile: " + tile
+                    println "neighbour: " + neighbourTile
+                    if (i == -1 && j == 0) {
+                        println "minXBufferFix"
+                        minXBufferFix = +BUFFER + BOUNDARY_BUFFER
+                    } else if (i == 1 && j == 0) {
+                        println "maxXBufferFix"
+                        maxXBufferFix = -BUFFER - BOUNDARY_BUFFER
+                    } else if (i == 0 && j == -1) {
+                        println "minYBufferFix"
+                        minYBufferFix = +BUFFER + BOUNDARY_BUFFER
+                    } else if (i == 0 && j == 1) {
+                        println "maxYBufferFix"
+                        maxYBufferFix = -BUFFER - BOUNDARY_BUFFER
+                    }
+                    continue
+                }
                 Format format = Format.getFormat(file)
                 Raster raster = format.read()
                 rasters.add(raster)
             }
         }
         Raster mosaicedRaster = Raster.mosaic(rasters)
-        Raster croppedRaster = mosaicedRaster.crop(new Bounds(minX - BUFFER,minY - BUFFER,maxX + BUFFER,maxY + BUFFER, "EPSG:2056"))
+        Raster croppedRaster = mosaicedRaster.crop(new Bounds(minX+minXBufferFix, minY+minYBufferFix, maxX+maxXBufferFix, maxY+maxYBufferFix, "EPSG:2056"))
 
         File outFile = new File(TEMP_FOLDER + "input0.tif")
         Format outFormat = Format.getFormat(outFile)
@@ -154,12 +187,30 @@ dest = mean(values);
             // ist, weiss ich nicht. Jedenfalls das Auseinanderpfrimeln
             // braucht es.
 
+            println("Höhe: " + feat.get("value"))
+            int hoehe = feat.get("value")
+            if (hoehe == 682) {
+                println ("--------------------")
+                println feat.geom.getClass()
+                println feat.geom.g.getClass()
+
+                println feat.geom.getGeometryType()
+                println feat.geom.toString()
+            }
+
             org.locationtech.jts.geom.LineString fg = feat.geom.g
             org.locationtech.jts.geom.MultiPolygon kg = perimeter.features.get(0).geom.g
             org.locationtech.jts.geom.Polygon bg = bounds.geometry.g
 
             org.locationtech.jts.geom.Geometry cg_tmp = OverlayOp.overlayOp(fg, kg, OverlayOp.INTERSECTION)
             org.locationtech.jts.geom.Geometry cg = OverlayOp.overlayOp(cg_tmp, bg, OverlayOp.INTERSECTION)
+
+            if (hoehe == 682) {
+                println cg_tmp.getGeometryType()
+                println cg.getGeometryType()
+            }
+
+
 
             if (cg instanceof org.locationtech.jts.geom.MultiLineString) {
                 for (int j=0; j<cg.numGeometries; j++) {
