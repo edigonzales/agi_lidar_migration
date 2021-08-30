@@ -149,7 +149,7 @@ dest = mean(values);
         println contours.features.size()
 
         Workspace workspace = new Memory()
-        Layer clippedContours = workspace.create(contours.schema);
+        Layer clippedContours = workspace.create(contours.schema)
         List<Feature> clippedFeatures = []
 
         Bounds bounds = new Bounds(env.getMinX(), env.getMinY(), env.getMaxX(), env.getMaxY(), "EPSG:2056")
@@ -174,7 +174,7 @@ dest = mean(values);
                     def uuid = UUID.randomUUID().toString()
                     Feature f = new Feature([
                             value: feat.get("value"),
-                            geom: new LineString(lineString)
+                            geom: new LineString(lineString).simplify(0.01)
                     ], uuid, schema)
                     clippedFeatures.add(f)
                 }
@@ -189,7 +189,7 @@ dest = mean(values);
                         def uuid = UUID.randomUUID().toString()
                         Feature f = new Feature([
                                 value: feat.get("value"),
-                                geom: new LineString(lineString)
+                                geom: new LineString(lineString).simplify(0.01)
                         ], uuid, schema)
                         clippedFeatures.add(f)
                     } else if (g instanceof org.locationtech.jts.geom.MultiLineString) {
@@ -198,7 +198,7 @@ dest = mean(values);
                             def uuid = UUID.randomUUID().toString()
                             Feature f = new Feature([
                                     value: feat.get("value"),
-                                    geom: new LineString(lineString)
+                                    geom: new LineString(lineString).simplify(0.01)
                             ], uuid, schema)
                             clippedFeatures.add(f)
                         }
@@ -206,9 +206,14 @@ dest = mean(values);
                 }
             } else {
                 def uuid = UUID.randomUUID().toString()
+
+                // TODO: falls Anfangs- und Endpunkt nicht stabil, debuggen.
+                // Notfalls wegspeichern und austauschen.
+                // -> Funktion
+
                 Feature f = new Feature([
                         value: feat.get("value"),
-                        geom: new LineString(cg)
+                        geom: new LineString(cg).simplify(0.01)
                 ], uuid, schema)
                 clippedFeatures.add(f)
             }
