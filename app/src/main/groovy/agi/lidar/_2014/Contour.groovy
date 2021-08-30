@@ -175,7 +175,7 @@ dest = mean(values);
         Layer clippedContours = workspace.create(contours.schema);
         List<Feature> clippedFeatures = []
 
-        Bounds bounds = new Bounds(minX, minY, maxX, maxY, "EPSG:2056")
+        Bounds bounds = new Bounds(env.getMinX(), env.getMinY(), env.getMaxX(), env.getMaxY(), "EPSG:2056")
         Schema schema = contours.schema
         println schema
 
@@ -187,7 +187,7 @@ dest = mean(values);
             // ist, weiss ich nicht. Jedenfalls das Auseinanderpfrimeln
             // braucht es.
 
-            println("Höhe: " + feat.get("value"))
+            //println("Höhe: " + feat.get("value"))
             int hoehe = feat.get("value")
             /*
             if (hoehe == 682) {
@@ -201,11 +201,11 @@ dest = mean(values);
              */
 
             org.locationtech.jts.geom.LineString fg = feat.geom.g
-            org.locationtech.jts.geom.MultiPolygon kg = perimeter.features.get(0).geom.g
+            //org.locationtech.jts.geom.MultiPolygon kg = perimeter.features.get(0).geom.g
             org.locationtech.jts.geom.Polygon bg = bounds.geometry.g
 
-            org.locationtech.jts.geom.Geometry cg_tmp = OverlayOp.overlayOp(fg, kg, OverlayOp.INTERSECTION)
-            org.locationtech.jts.geom.Geometry cg = OverlayOp.overlayOp(cg_tmp, bg, OverlayOp.INTERSECTION)
+            //org.locationtech.jts.geom.Geometry cg_tmp = OverlayOp.overlayOp(fg, kg, OverlayOp.INTERSECTION)
+            org.locationtech.jts.geom.Geometry cg = OverlayOp.overlayOp(fg, bg, OverlayOp.INTERSECTION)
 
             /*
             if (hoehe == 682) {
@@ -213,8 +213,6 @@ dest = mean(values);
                 println cg.getGeometryType()
             }
              */
-
-
 
             if (cg instanceof org.locationtech.jts.geom.MultiLineString) {
                 for (int j=0; j<cg.numGeometries; j++) {
