@@ -15,7 +15,7 @@ def tiles = vrt.VRTRasterBand[0].SimpleSource.collect { it ->
 
 tiles.each { tile ->
     println "Downloading ${tile}"
-    
+
     Paths.get(DOWNLOAD_FOLDER, tile + ".tif").toFile().withOutputStream { out ->
         out << new URL(DOWNLOAD_URL + tile + ".tif").openStream()
     }

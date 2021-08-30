@@ -62,8 +62,6 @@ for (Feature feature: tindex.features) {
         List<Raster> rasters = []
         for (int i=-1; i<=1; i++) {
             for (int j=-1; j<=1; j++) {
-                println "----------"
-
                 String neighbourTile = (easting + i) as String + (northing + j) as String + "_50cm.tif"
                 if (neighbourTile.equalsIgnoreCase(tile)) continue
 
@@ -106,7 +104,6 @@ for (Feature feature: tindex.features) {
             //String n = it.toString()
             //String nplus = new Integer(it+1).toString()
 
-            println i
             String n = i as String
             String nplus = new Integer(i+1).toString()
 
@@ -122,8 +119,8 @@ for (Feature feature: tindex.features) {
 options { outside = null; }
 
 values = [];
-foreach (dy in -1:1) {
-  foreach (dx in -1:1) {
+foreach (dy in -4:4) {
+  foreach (dx in -4:4) {
   
       values << src[dx, dy];
   }
@@ -146,7 +143,7 @@ dest = mean(values);
 
         int band = 0
         def interval = 1.0
-        boolean simplify = false
+        boolean simplify = true
         boolean smooth = false
         Layer contours = contourRaster.contours(band, interval, simplify, smooth)
         println contours.features.size()
