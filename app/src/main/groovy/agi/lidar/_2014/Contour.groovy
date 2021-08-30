@@ -85,19 +85,19 @@ for (Feature feature: tindex.features) {
                 // Achtung: Abhängig von den vorhandenen Daten im Verzeichnis.
                 // Und nicht etwa von einer Tileindex-Datei oder ähnlich.
                 if (!file.exists()) {
-                    println "tile: " + tile
-                    println "neighbour: " + neighbourTile
+                    //println "tile: " + tile
+                    //println "neighbour: " + neighbourTile
                     if (i == -1 && j == 0) {
-                        println "minXBufferFix"
+                        //println "minXBufferFix"
                         minXBufferFix = +BUFFER + BOUNDARY_BUFFER
                     } else if (i == 1 && j == 0) {
-                        println "maxXBufferFix"
+                        //println "maxXBufferFix"
                         maxXBufferFix = -BUFFER - BOUNDARY_BUFFER
                     } else if (i == 0 && j == -1) {
-                        println "minYBufferFix"
+                        //println "minYBufferFix"
                         minYBufferFix = +BUFFER + BOUNDARY_BUFFER
                     } else if (i == 0 && j == 1) {
-                        println "maxYBufferFix"
+                        //println "maxYBufferFix"
                         maxYBufferFix = -BUFFER - BOUNDARY_BUFFER
                     }
                     continue
