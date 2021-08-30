@@ -36,21 +36,12 @@ for (Feature feature: tindex.features) {
         String location = feature.get("location")
         String tile = location.reverse().substring(4, 17).reverse()
 
-        if (!tile.equalsIgnoreCase("25931226_50cm")) {
-            continue;
-        }
+        File resultFile = Paths.get(RESULT_FOLDER, tile + ".gpkg").toFile()
+
+        //if (resultFile.exists()) continue
+        //if (resultFile.exists()) resultFile.delete()
 
         println "Processing: ${tile}"
-
-        File resultFile = Paths.get(RESULT_FOLDER, tile + ".gpkg").toFile()
-        /*
-        if (resultFile.exists()) {
-            println "skipping... "
-            continue
-        }
-        */
-
-        //if (resultFile.exists()) resultFile.delete()
 
         def geom = feature.geom
         def env = geom.envelope
