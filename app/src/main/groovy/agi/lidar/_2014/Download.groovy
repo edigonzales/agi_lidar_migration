@@ -1,5 +1,7 @@
 package agi.lidar._2014
 
+import agi.lidar.Utils
+
 import java.nio.file.Paths
 
 def DOWNLOAD_FOLDER = "/Users/stefan/tmp/geodata/ch.so.agi.lidar_2014.dtm/"
@@ -21,8 +23,12 @@ tiles.each { tile ->
         }
     }
 */
+    /*
     Paths.get(DOWNLOAD_FOLDER, tile + ".tif").toFile().withOutputStream { out ->
         out << new URL(DOWNLOAD_URL + tile + ".tif").openStream()
     }
 
+     */
+
+    Utils.fubar()
 }
