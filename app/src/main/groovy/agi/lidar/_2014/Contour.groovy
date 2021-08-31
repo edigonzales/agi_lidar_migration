@@ -19,11 +19,12 @@ import java.nio.file.Paths
 
 import static groovy.io.FileType.FILES
 
+def USER_HOME = System.getProperty("user.home");
 def PERIMETER = "../data/2014/perimeter_5m.gpkg"
 def TINDEX = "../data/2014/tindex.shp"
-def DATA_FOLDER = "/Users/stefan/tmp/geodata/ch.so.agi.lidar_2014.dtm/"
-def RESULT_FOLDER = "/Users/stefan/tmp/geodata/ch.so.agi.lidar_2014.dtm_gpkg_tmp/"
-def TEMP_FOLDER = "/Users/stefan/tmp/geodata/tmp/"
+def DATA_FOLDER = USER_HOME + "/tmp/geodata/ch.so.agi.lidar_2014.dtm/"
+def RESULT_FOLDER = USER_HOME + "/tmp/geodata/ch.so.agi.lidar_2014.dtm_gpkg_tmp/"
+def TEMP_FOLDER = USER_HOME + "/tmp/geodata/tmp/"
 def BUFFER = 50
 def BOUNDARY_BUFFER = 5
 def PIXEL_SIZE = 0.5
