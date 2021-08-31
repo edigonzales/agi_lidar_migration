@@ -34,6 +34,9 @@ Layer perimeter = perimeterWs.get("perimeter")
 Shapefile tindex = new Shapefile(TINDEX)
 
 for (Feature feature: tindex.features) {
+
+    println "********"+DATA_FOLDER
+
     try {
         String location = feature.get("location")
         String tile = location.reverse().substring(4, 17).reverse()
