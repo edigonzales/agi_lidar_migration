@@ -1,0 +1,8 @@
+#cloud-config
+users:
+    - name: appuser
+      shell: /bin/bash
+package_upgrade: false
+runcmd:
+    - apt update
+    - apt-get install -y zip unzip vim git

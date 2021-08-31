@@ -190,8 +190,6 @@ dest = mean(values);
             // Ob jetzt die Umwandlung zu JTS und zurück noch notwendig
             // ist, weiss ich nicht. Jedenfalls das Auseinanderpfrimeln
             // braucht es.
-
-
             org.locationtech.jts.geom.LineString fg = feat.geom.g
             org.locationtech.jts.geom.MultiPolygon kg = perimeter.features.get(0).geom.g
             org.locationtech.jts.geom.Polygon bg = bounds.geometry.g
