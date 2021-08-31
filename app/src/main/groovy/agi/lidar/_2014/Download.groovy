@@ -4,7 +4,8 @@ import agi.lidar.Utils
 
 import java.nio.file.Paths
 
-def DOWNLOAD_FOLDER = "/Users/stefan/tmp/geodata/ch.so.agi.lidar_2014.dtm/"
+def USER_HOME = System.getProperty("user.home");
+def DOWNLOAD_FOLDER = USER_HOME + "/tmp/geodata/ch.so.agi.lidar_2014.dtm/"
 def DOWNLOAD_URL = "https://geo.so.ch/geodata/ch.so.agi.lidar_2014.dtm/"
 
 // Read (gdal) VRT file to get a list of all tif files.
