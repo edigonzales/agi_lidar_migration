@@ -19,14 +19,13 @@ import java.nio.file.Paths
 
 import static groovy.io.FileType.FILES
 
-def PERIMETER = "../data/2014/perimeter_5m.gpkg"
+def PERIMETER = "../data/2014/perimeter.gpkg"
 def TINDEX = "../data/2014/tindex.shp"
 def DATA_FOLDER = "/Users/stefan/tmp/geodata/ch.so.agi.lidar_2014.dtm/"
 def RESULT_FOLDER = "/Users/stefan/tmp/geodata/ch.so.agi.lidar_2014.dtm_gpkg_tmp/"
 def TEMP_FOLDER = "/Users/stefan/tmp/geodata/tmp/"
 def BUFFER = 50
 def BOUNDARY_BUFFER = 5
-def PIXEL_SIZE = 0.5
 
 GeoPackage perimeterWs = new GeoPackage(new File(PERIMETER))
 Layer perimeter = perimeterWs.get("perimeter")
@@ -54,12 +53,6 @@ for (Feature feature: tindex.features) {
 
         int easting = tile.substring(0,4) as Integer
         int northing = tile.substring(4,8) as Integer
-
-        int mosaicMinX = minX
-        int mosaicMinY = minY
-        int mosaicMaxX = maxX
-        int mosaicMaxY = maxY
-        Bounds mosaicBounds = null
 
         int minXBufferFix = 0
         int maxXBufferFix = 0
@@ -90,28 +83,9 @@ for (Feature feature: tindex.features) {
                 Format format = Format.getFormat(file)
                 Raster raster = format.read()
                 rasters.add(raster)
-
-                if (raster.bounds.minX < mosaicMinX) {
-                    mosaicMinX = raster.bounds.minX
-                }
-                if (raster.bounds.minY < mosaicMinY) {
-                    mosaicMinY = raster.bounds.minY
-                }
-                if (raster.bounds.maxX > mosaicMaxX) {
-                    mosaicMaxX = raster.bounds.maxX
-                }
-                if (raster.bounds.maxY > mosaicMaxY) {
-                    mosaicMaxY = raster.bounds.maxY
-                }
-
-                mosaicBounds = new Bounds(mosaicMinX, mosaicMinY, mosaicMaxX, mosaicMaxY)
             }
         }
-        int width = (mosaicMaxX - mosaicMinX) / PIXEL_SIZE
-        int height = (mosaicMaxY - mosaicMinY) / PIXEL_SIZE
-        def size = [width, height]
-        def options = ["size": size, "bounds": mosaicBounds]
-        Raster mosaicedRaster = Raster.mosaic(options, rasters)
+        Raster mosaicedRaster = Raster.mosaic(rasters)
         Raster croppedRaster = mosaicedRaster.crop(new Bounds(minX+minXBufferFix, minY+minYBufferFix, maxX+maxXBufferFix, maxY+maxYBufferFix, "EPSG:2056"))
 
         File outFile = new File(TEMP_FOLDER + "input0.tif")
@@ -146,8 +120,8 @@ for (Feature feature: tindex.features) {
 options { outside = null; }
 
 values = [];
-foreach (dy in -2:2) {
-  foreach (dx in -2:2) {
+foreach (dy in -1:1) {
+  foreach (dx in -1:1) {
   
       values << src[dx, dy];
   }
@@ -162,6 +136,7 @@ dest = mean(values);
             Format outFormatSmooth = Format.getFormat(outFileSmooth)
             outFormatSmooth.write(outputSmooth)
         }
+
 
         // 3. Höhenkurven
         File file = new File(Paths.get(outfile).toFile().getAbsolutePath())
@@ -191,15 +166,10 @@ dest = mean(values);
             // ist, weiss ich nicht. Jedenfalls das Auseinanderpfrimeln
             // braucht es.
 
-
+            /*
             org.locationtech.jts.geom.LineString fg = feat.geom.g
-            org.locationtech.jts.geom.MultiPolygon kg = perimeter.features.get(0).geom.g
             org.locationtech.jts.geom.Polygon bg = bounds.geometry.g
-
-            // Erster Verschnitt ist nur noch für die Kacheln nochtwendig, die an einer Ecke an eine nicht
-            // vorhanden Kachel grenzen. Könnte man eventuell auch noch beim Raster abfangen.
-            org.locationtech.jts.geom.Geometry cg_tmp = OverlayOp.overlayOp(fg, kg, OverlayOp.INTERSECTION)
-            org.locationtech.jts.geom.Geometry cg = OverlayOp.overlayOp(cg_tmp, bg, OverlayOp.INTERSECTION)
+            org.locationtech.jts.geom.Geometry cg = OverlayOp.overlayOp(fg, bg, OverlayOp.INTERSECTION)
 
             if (cg instanceof org.locationtech.jts.geom.MultiLineString) {
                 for (int j=0; j<cg.numGeometries; j++) {
@@ -239,18 +209,29 @@ dest = mean(values);
                 }
             } else {
                 def uuid = UUID.randomUUID().toString()
+
+                //println "----------------------------"
+                //println cg.coordinates[0]
+                //println new LineString(cg).simplify(0.01).coordinates[0]
+
+                // TODO: falls Anfangs- und Endpunkt nicht stabil, debuggen.
+                // Notfalls wegspeichern und austauschen.
+                // -> Funktion
+
                 Feature f = new Feature([
                         value: feat.get("value"),
                         geom: new LineString(cg).simplify(0.01)
                 ], uuid, schema)
                 clippedFeatures.add(f)
             }
+             */
         }
 
         clippedContours.add(clippedFeatures)
 
         Workspace geopkg = new GeoPackage(resultFile)
-        geopkg.add(clippedContours, tile)
+        //geopkg.add(clippedContours, tile)
+        geopkg.add(contours, tile)
         geopkg.close()
 
         new ZipFile(Paths.get(RESULT_FOLDER, tile + ".zip").toFile().getAbsolutePath()).addFile(resultFile)
