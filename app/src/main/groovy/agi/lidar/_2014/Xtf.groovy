@@ -85,12 +85,21 @@ for (Feature f: tindex.features) {
                                 List<Point> pointsBatch = []
 
                                 // Forschleife, damit man -1 machen kann
-                                points.each { point ->
-                                    println j
+                                for (Point point : points) {
 
-                                    // if letzter Punkt -> Flush
-                                    //if ()
+                                //points.each { point ->
+                                    //println j
 
+                                    if ( cleanedLine.getEndPoint().equals(point)) {
+                                        println "FUUUUUUBar"
+
+                                        LineString splittedLine = new LineString(pointsBatch)
+                                        println splittedLine.numPoints
+                                        pointsBatch.clear()
+                                        j=1
+                                        //continue
+
+                                    }
 
                                     if (j==256) {
                                         println "neue linie"
@@ -99,6 +108,7 @@ for (Feature f: tindex.features) {
                                         println splittedLine.numPoints
                                         pointsBatch.clear()
                                         j=1
+                                        // continue
                                     }
                                     //Coordinate coord = new Coordinate(point.x, point.y)
                                     pointsBatch.add(point)
