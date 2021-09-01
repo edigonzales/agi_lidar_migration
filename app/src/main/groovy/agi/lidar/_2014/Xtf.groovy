@@ -30,7 +30,7 @@ def TEMP_FOLDER = USER_HOME + "/tmp/geodata/tmp/"
 def XTF_FOLDER = USER_HOME + "/tmp/geodata/ch.so.agi.lidar_2014.xtf/"
 def TEMPLATE_DB_FILE = Paths.get("../data/template_lidar_3D.mv.db").toFile().getAbsolutePath()
 def MODEL_NAME = "SO_AGI_Hoehenkurven_3D_Publikation_20210115"
-def JAHR = 2014
+def YEAR = 2014
 
 Shapefile tindex = new Shapefile(TINDEX)
 
@@ -65,6 +65,8 @@ for (Feature f: tindex.features) {
                     for (int i=0; i<geom.numGeometries; i++) {
                         def t_id = sql.firstRow("SELECT next value FOR t_ili2db_seq AS t_id").values().getAt(0)
                         LineString line = geom.getGeometryN(i).reducePrecision("fixed", scale: 1000)
+                        println line.getPoints().get(0).z
+
 
                         // Z-Koordinate wird beim Erstellen des LineString ignoriert.
                         def coords = line.coordinates.collect() {it ->
@@ -83,24 +85,17 @@ for (Feature f: tindex.features) {
                                 List<Point> points = cleanedLine.getPoints()
                                 int j=1
                                 List<Point> pointsBatch = []
-
-                                // Forschleife, damit man -1 machen kann
                                 for (int k=0; k<points.size();k++) {
                                     Point point = points.get(k)
-                                //points.each { point ->
-                                    //println j
 
                                     if (cleanedLine.getEndPoint().equals(point)) {
-                                        println "FUUUUUUBar"
-
                                         if (pointsBatch.size() > 1) {
                                             LineString splittedLine = new LineString(pointsBatch)
-                                            println splittedLine.numPoints
                                             pointsBatch.clear()
                                             j=1
                                             //k -= 1
                                             def id = sql.firstRow("SELECT next value FOR t_ili2db_seq AS t_id").values().getAt(0)
-                                            def insertSql = "INSERT INTO hoehenkurve (t_id, kote, geometrie, jahr) VALUES ($id, $elev, ST_UpdateZ(ST_LineFromText($splittedLine.wkt), $elev), $JAHR)"
+                                            def insertSql = "INSERT INTO hoehenkurve (t_id, kote, geometrie, jahr) VALUES ($id, $elev, ST_UpdateZ(ST_LineFromText($splittedLine.wkt), $elev), $YEAR)"
                                             sql.execute(insertSql)
 
                                             continue
@@ -108,29 +103,23 @@ for (Feature f: tindex.features) {
                                     }
 
                                     if (j==256) {
-                                        println "neue linie"
-                                        //println pointsBatch
                                         LineString splittedLine = new LineString(pointsBatch)
-                                        println splittedLine.numPoints
                                         pointsBatch.clear()
                                         j=1
                                         //k -= 1
                                         def id = sql.firstRow("SELECT next value FOR t_ili2db_seq AS t_id").values().getAt(0)
-                                        def insertSql = "INSERT INTO hoehenkurve (t_id, kote, geometrie, jahr) VALUES ($id, $elev, ST_UpdateZ(ST_LineFromText($splittedLine.wkt), $elev), $JAHR)"
+                                        def insertSql = "INSERT INTO hoehenkurve (t_id, kote, geometrie, jahr) VALUES ($id, $elev, ST_UpdateZ(ST_LineFromText($splittedLine.wkt), $elev), $YEAR)"
                                         sql.execute(insertSql)
 
                                         continue
                                     }
-                                    //Coordinate coord = new Coordinate(point.x, point.y)
                                     pointsBatch.add(point)
-                                    //println point.wkt
-                                    
                                     j++
                                     k++
                                 }
                             } else {
                                 //def insertSql = "INSERT INTO hoehenkurve (t_id, kote, geometrie, jahr) VALUES ($t_id, $elev, ST_LineFromText($cleanedLine.wkt), 2014)"
-                                def insertSql = "INSERT INTO hoehenkurve (t_id, kote, geometrie, jahr) VALUES ($t_id, $elev, ST_UpdateZ(ST_LineFromText($cleanedLine.wkt), $elev), $JAHR)"
+                                def insertSql = "INSERT INTO hoehenkurve (t_id, kote, geometrie, jahr) VALUES ($t_id, $elev, ST_UpdateZ(ST_LineFromText($cleanedLine.wkt), $elev), $YEAR)"
                                 sql.execute(insertSql)
 
                             }
