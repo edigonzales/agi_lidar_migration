@@ -44,6 +44,11 @@ Das Herstellen des Mosaic hat einen Bug, welcher dazu führt, dass die Ausdehnun
 
 ## Create XTF
 
+```
+java -jar /Users/stefan/apps/ili2gpkg-4.5.0/ili2gpkg-4.5.0.jar --dbfile fubar.gpkg --disableValidation --strokeArcs --defaultSrsCode 2056 --modeldir "../../../sources/agi_lidar_migration/model;http://models.geo.admin.ch" --models SO_AGI_Hoehenkurven_3D_Publikation_20210115 --doSchemaImport --import 25921228_50cm_tmp.xtf
+java -jar /Users/stefan/apps/ili2pg-4.5.0/ili2pg-4.5.0.jar --dbhost localhost --dbport 54321 --dbdatabase edit --dbschema agi_hoehenkurven_2014 --dbusr gretl --dbpwd gretl  --disableValidation --strokeArcs --defaultSrsCode 2056 --modeldir "../../../sources/agi_lidar_migration/model;http://models.geo.admin.ch" --models SO_AGI_Hoehenkurven_3D_Publikation_20210115 --doSchemaImport --import 25921228_50cm_tmp.xtf
+```
+
 ### Create ili2h2gis template db
 ```
 java -jar /Users/stefan/apps/ili2h2gis-4.4.5/ili2h2gis-4.4.5.jar --dbfile template_lidar_2D --strokeArcs --defaultSrsCode 2056 --disableValidation --modeldir ".;http://models.geo.admin.ch" --models SO_AGI_Hoehenkurven_2D_Publikation_20210115 --schemaimport

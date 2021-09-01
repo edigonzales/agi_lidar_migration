@@ -16,8 +16,8 @@ targetCompatibility = '1.8'
 
 dependencies {
     implementation 'org.codehaus.groovy:groovy-all:3.0.8'
-    //implementation 'org.geoscript:geoscript-groovy:1.18-SNAPSHOT'
-    implementation 'org.geoscript:geoscript-groovy:1.17.0'
+    implementation 'org.geoscript:geoscript-groovy:1.18-SNAPSHOT'
+    //implementation 'org.geoscript:geoscript-groovy:1.17.0'
     //implementation 'org.codehaus.groovy:groovy-all:3.0.5'
     //implementation 'org.geoscript:geoscript-groovy:1.16.0'
     //implementation 'org.gdal:gdal:3.0.0'

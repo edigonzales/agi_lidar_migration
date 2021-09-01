@@ -60,13 +60,12 @@ for (Feature f: tindex.features) {
             contours.eachFeature { Feature feature ->
                 //println feature.toString()
                 def elev = feature["value"]
+                //println "elev: " + elev
                 Geometry geom = feature.the_geom
                 if (geom != null) {
                     for (int i=0; i<geom.numGeometries; i++) {
                         def t_id = sql.firstRow("SELECT next value FOR t_ili2db_seq AS t_id").values().getAt(0)
                         LineString line = geom.getGeometryN(i).reducePrecision("fixed", scale: 1000)
-                        println line.getPoints().get(0).z
-
 
                         // Z-Koordinate wird beim Erstellen des LineString ignoriert.
                         def coords = line.coordinates.collect() {it ->
@@ -82,18 +81,38 @@ for (Feature f: tindex.features) {
                             LineString cleanedLine = new LineString(coords)
 
                             if (cleanedLine.numPoints > 256) {
+
+                                if (elev as int == 1190) {
+                                    println cleanedLine.wkt
+                                    println cleanedLine.numPoints
+                                }
+
                                 List<Point> points = cleanedLine.getPoints()
                                 int j=1
                                 List<Point> pointsBatch = []
                                 for (int k=0; k<points.size();k++) {
                                     Point point = points.get(k)
 
-                                    if (cleanedLine.getEndPoint().equals(point)) {
+                                    if (elev as int == 1190) {
+                                        println point.wkt
+                                        println "j="+j
+                                        println "k="+k
+                                    }
+
+                                    if (cleanedLine.getEndPoint().equals(point) && k > 0) {
+                                        if (elev as int == 1190) {
+                                            println "**"+cleanedLine.getEndPoint().wkt
+                                            println "--"+point.wkt
+                                            println "should not"
+
+                                        }
                                         if (pointsBatch.size() > 1) {
+                                            pointsBatch.add(point)
                                             LineString splittedLine = new LineString(pointsBatch)
+                                            //println "-----"+splittedLine
                                             pointsBatch.clear()
                                             j=1
-                                            //k -= 1
+                                            k -= 2
                                             def id = sql.firstRow("SELECT next value FOR t_ili2db_seq AS t_id").values().getAt(0)
                                             def insertSql = "INSERT INTO hoehenkurve (t_id, kote, geometrie, jahr) VALUES ($id, $elev, ST_UpdateZ(ST_LineFromText($splittedLine.wkt), $elev), $YEAR)"
                                             sql.execute(insertSql)
@@ -102,20 +121,28 @@ for (Feature f: tindex.features) {
                                         }
                                     }
 
-                                    if (j==256) {
+                                    // Eigentlich 256. Aber es darf nicht ein einzelner Vertexpunkt übrigbleiben.
+                                    // Damit kann keine Geometrie gemacht werden.
+                                    if (j==255) {
+                                        if (elev as int == 1190) {
+                                            println "new line"
+                                        }
+
                                         LineString splittedLine = new LineString(pointsBatch)
+                                        //println "*****"+splittedLine
                                         pointsBatch.clear()
                                         j=1
-                                        //k -= 1
+                                        k -= 2
                                         def id = sql.firstRow("SELECT next value FOR t_ili2db_seq AS t_id").values().getAt(0)
                                         def insertSql = "INSERT INTO hoehenkurve (t_id, kote, geometrie, jahr) VALUES ($id, $elev, ST_UpdateZ(ST_LineFromText($splittedLine.wkt), $elev), $YEAR)"
                                         sql.execute(insertSql)
 
                                         continue
                                     }
+
                                     pointsBatch.add(point)
                                     j++
-                                    k++
+                                    //k++
                                 }
                             } else {
                                 //def insertSql = "INSERT INTO hoehenkurve (t_id, kote, geometrie, jahr) VALUES ($t_id, $elev, ST_LineFromText($cleanedLine.wkt), 2014)"
