@@ -268,10 +268,7 @@ dest = mean(values);
 
             new ZipFile(Paths.get(RESULT_FOLDER, tile + ".zip").toFile().getAbsolutePath()).addFile(resultFile)
 
-
-            //tmpDir.deleteDir()
-
-
+            tmpDir.deleteDir()
 
         } catch (Exception e) {
             e.printStackTrace()
