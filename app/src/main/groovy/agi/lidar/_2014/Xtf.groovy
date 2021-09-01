@@ -85,20 +85,26 @@ for (Feature f: tindex.features) {
                                 List<Point> pointsBatch = []
 
                                 // Forschleife, damit man -1 machen kann
-                                for (Point point : points) {
-
+                                for (int k=0; k<points.size();k++) {
+                                    Point point = points.get(k)
                                 //points.each { point ->
                                     //println j
 
-                                    if ( cleanedLine.getEndPoint().equals(point)) {
+                                    if (cleanedLine.getEndPoint().equals(point)) {
                                         println "FUUUUUUBar"
 
-                                        LineString splittedLine = new LineString(pointsBatch)
-                                        println splittedLine.numPoints
-                                        pointsBatch.clear()
-                                        j=1
-                                        //continue
+                                        if (pointsBatch.size() > 1) {
+                                            LineString splittedLine = new LineString(pointsBatch)
+                                            println splittedLine.numPoints
+                                            pointsBatch.clear()
+                                            j=1
+                                            //k -= 1
+                                            def id = sql.firstRow("SELECT next value FOR t_ili2db_seq AS t_id").values().getAt(0)
+                                            def insertSql = "INSERT INTO hoehenkurve (t_id, kote, geometrie, jahr) VALUES ($id, $elev, ST_UpdateZ(ST_LineFromText($splittedLine.wkt), $elev), $JAHR)"
+                                            sql.execute(insertSql)
 
+                                            continue
+                                        }
                                     }
 
                                     if (j==256) {
@@ -108,41 +114,46 @@ for (Feature f: tindex.features) {
                                         println splittedLine.numPoints
                                         pointsBatch.clear()
                                         j=1
-                                        // continue
+                                        //k -= 1
+                                        def id = sql.firstRow("SELECT next value FOR t_ili2db_seq AS t_id").values().getAt(0)
+                                        def insertSql = "INSERT INTO hoehenkurve (t_id, kote, geometrie, jahr) VALUES ($id, $elev, ST_UpdateZ(ST_LineFromText($splittedLine.wkt), $elev), $JAHR)"
+                                        sql.execute(insertSql)
+
+                                        continue
                                     }
                                     //Coordinate coord = new Coordinate(point.x, point.y)
                                     pointsBatch.add(point)
                                     //println point.wkt
                                     
                                     j++
+                                    k++
                                 }
+                            } else {
+                                //def insertSql = "INSERT INTO hoehenkurve (t_id, kote, geometrie, jahr) VALUES ($t_id, $elev, ST_LineFromText($cleanedLine.wkt), 2014)"
+                                def insertSql = "INSERT INTO hoehenkurve (t_id, kote, geometrie, jahr) VALUES ($t_id, $elev, ST_UpdateZ(ST_LineFromText($cleanedLine.wkt), $elev), $JAHR)"
+                                sql.execute(insertSql)
+
                             }
-
-                            //println cleanedLine.getNumPoints()
-
-                            //def insertSql = "INSERT INTO hoehenkurve (t_id, kote, geometrie, jahr) VALUES ($t_id, $elev, ST_LineFromText($cleanedLine.wkt), 2014)"
-                            def insertSql = "INSERT INTO hoehenkurve (t_id, kote, geometrie, jahr) VALUES ($t_id, $elev, ST_UpdateZ(ST_LineFromText($cleanedLine.wkt), $elev), $JAHR)"
-                            sql.execute(insertSql)
                         }
                     }
                 }
             }
         }
 
-//        //Export XTF
-//        Config settingsH2 = new Config();
-//        new H2gisMain().initConfig(settingsH2);
-//        settingsH2.setFunction(Config.FC_EXPORT)
-//        settingsH2.setModels(MODEL_NAME)
-//        settingsH2.setModeldir(Paths.get("../model").toFile().getAbsolutePath()+";"+"http://models.geo.admin.ch")
-//        settingsH2.setDbfile(new File(dbFileName).getAbsolutePath());
-//        settingsH2.setValidation(false);
-//        settingsH2.setItfTransferfile(false);
-//        settingsH2.setDburl(h2.url);
-//        def xtfTempFileName = Paths.get(TEMP_FOLDER, tile + "_tmp.xtf").toFile().getAbsolutePath()
-//        settingsH2.setXtffile(xtfTempFileName);
-//        Ili2db.run(settingsH2, null);
-//
+        //Export XTF
+        Config settingsH2 = new Config();
+        new H2gisMain().initConfig(settingsH2);
+        settingsH2.setFunction(Config.FC_EXPORT)
+        settingsH2.setModels(MODEL_NAME)
+        settingsH2.setModeldir(Paths.get("../model").toFile().getAbsolutePath()+";"+"http://models.geo.admin.ch")
+        settingsH2.setDbfile(new File(dbFileName).getAbsolutePath());
+        settingsH2.setValidation(false);
+        settingsH2.setItfTransferfile(false);
+        settingsH2.setDburl(h2.url);
+        def xtfTempFileName = Paths.get(TEMP_FOLDER, tile + "_tmp.xtf").toFile().getAbsolutePath()
+        settingsH2.setXtffile(xtfTempFileName);
+        Ili2db.run(settingsH2, null);
+
 //        // Import XTF to subdivide
 //        def pg = [url:"jdbc:postgresql://localhost:54321/edit", user:'gretl', password:'gretl', driver:'org.postgresql.Driver']
 //
