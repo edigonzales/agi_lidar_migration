@@ -1,24 +1,13 @@
+
 # agi_lidar_migration
 
 ## TODO
 - Dokumentation: Perimeterrand ist kleiner, damit die unschönen Randartefakte verschwinden.
+- Problem: 25931226_50cm.gpkg. Höhenkurve x-fach vorhanden (tid=1353ff, value=684)
+
 
 ## Links
 - https://github.com/edigonzales-archiv/av_lidar_produkte/blob/master/contour/contour.py
-
-## Funktionen
-
-### Download
-Download der Kacheln von geo.so.ch/geodata.
-
-### Contour
-Berechnung der Höhenlinien. 
-
-Weil Kacheln am Perimeterrand auf wenige Pixel sehr grosse Höhendifferenzen aufweisen (z.B. 1000m -> 0m) entstehen in diesen Regionen sehr viele Höhenkurven. Das kann zu technischen Problemen führen, sie sind visuell hässlich und ohne Aussagekraft. Um dem Vorzubeugen werden die Kacheln bereits vor dem Berechnen der Höhenkurven an der betroffenen Kante verkleinert. Übrig bleibt ein kleines Quadrat bei Kacheln, die sich nicht an einer Kante berühren, sondern nur an einem Punkt. Diese Artefakte werden durch einen Verschnitt mit einem Perimeter-Vektorlayer nach der Berechnung der Höhenkurven entfernt. Den zweiten Schritt könnte man wohl auch noch mit dem ersten Schritt durchführen. Aus Gründen der Klarheit/Einfachheit und der Performance. Die Berechnung dieser "falschen" Höhenkurven ist relativ zeitaufändig.
-
-Damit kachelweise gerechnet werden kann und die Höhenkurven an den Kachelgrenzen perfekt zusammenpassen, kann nicht nur eine einzelne Kachel prozessiert werden, sondern es muss ein Buffer berücksichtigt werden (z.B. 50m). D.h. nach der Berechnung der Höhenkurven müssen diese auf die ursprüngliche Kachel zurückgeschnitten werden. Hier scheint es einen Bug mit Multilinestrings zu geben. Dies führt zu ganz komischen Verknüpfungen/Verbindungen zwischen Geometrien. Es wird über jedes Feature iteriert und jede Geometrie speziell behandelt (auch Geometrycollection und Punkte). Momentan werden die Geoscript Geometrien nach JTS-Geometrien umgewandelt. Das dürfte unnötig sein (Relikt des Bughuntings).
-
-Das Herstellen des Mosaic hat einen Bug, welcher dazu führt, dass die Ausdehnung (width, height) des Mosaics falsch ist. Aus diesem Grund wird die Ausdehnung selber berechnet und als Parameter der Methode übergeben.
 
 ## Create XTF
 
@@ -128,4 +117,3 @@ tiles.each {tile ->
     }
 }
 ```
-

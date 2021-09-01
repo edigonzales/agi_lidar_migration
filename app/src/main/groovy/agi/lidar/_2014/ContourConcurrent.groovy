@@ -14,13 +14,14 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 
-def PERIMETER = "../data/2014/perimeter.gpkg"
+def PERIMETER = "../data/2014/perimeter_5m.gpkg"
 def TINDEX = "../data/2014/tindex.shp"
 def DATA_FOLDER = "/Users/stefan/tmp/geodata/ch.so.agi.lidar_2014.dtm/"
 def RESULT_FOLDER = "/Users/stefan/tmp/geodata/ch.so.agi.lidar_2014.dtm_gpkg_tmp/"
 def TEMP_FOLDER = "/Users/stefan/tmp/geodata/tmp/"
 def BUFFER = 50
 def BOUNDARY_BUFFER = 5
+def PIXEL_SIZE = 0.5
 
 def list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
@@ -54,6 +55,12 @@ GParsPool.withPool(2) {
 
             int easting = tile.substring(0,4) as Integer
             int northing = tile.substring(4,8) as Integer
+
+            int mosaicMinX = minX
+            int mosaicMinY = minY
+            int mosaicMaxX = maxX
+            int mosaicMaxY = maxY
+            Bounds mosaicBounds = null
 
             int minXBufferFix = 0
             int maxXBufferFix = 0
@@ -93,10 +100,30 @@ GParsPool.withPool(2) {
                     Format format = Format.getFormat(file)
                     Raster raster = format.read()
                     rasters.add(raster)
+
+                    if (raster.bounds.minX < mosaicMinX) {
+                        mosaicMinX = raster.bounds.minX
+                    }
+                    if (raster.bounds.minY < mosaicMinY) {
+                        mosaicMinY = raster.bounds.minY
+                    }
+                    if (raster.bounds.maxX > mosaicMaxX) {
+                        mosaicMaxX = raster.bounds.maxX
+                    }
+                    if (raster.bounds.maxY > mosaicMaxY) {
+                        mosaicMaxY = raster.bounds.maxY
+                    }
+
+                    mosaicBounds = new Bounds(mosaicMinX, mosaicMinY, mosaicMaxX, mosaicMaxY)
                 }
             }
+            int width = (mosaicMaxX - mosaicMinX) / PIXEL_SIZE
+            int height = (mosaicMaxY - mosaicMinY) / PIXEL_SIZE
+            def size = [width, height]
+            def options = ["size": size, "bounds": mosaicBounds]
+
             synchronized (this) {
-                Raster mosaicedRaster = Raster.mosaic(rasters)
+                Raster mosaicedRaster = Raster.mosaic(options, rasters)
                 Raster croppedRaster = mosaicedRaster.crop(new Bounds(minX+minXBufferFix, minY+minYBufferFix, maxX+maxXBufferFix, maxY+maxYBufferFix, "EPSG:2056"))
 
                 File outFile = Paths.get(tmpDir.getAbsolutePath(), "input0.tif").toFile()
@@ -127,8 +154,8 @@ GParsPool.withPool(2) {
 options { outside = null; }
 
 values = [];
-foreach (dy in -1:1) {
-  foreach (dx in -1:1) {
+foreach (dy in -2:2) {
+  foreach (dx in -2:2) {
   
       values << src[dx, dy];
   }

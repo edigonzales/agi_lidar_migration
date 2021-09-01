@@ -22,25 +22,23 @@ import net.lingala.zip4j.ZipFile
 
 import java.util.stream.Collectors
 
-
-def DATA_FOLDER = "/Volumes/Samsung_T5/geodata/ch.so.agi.lidar_2014.contour50cm_gpkg/"
-def TEMP_FOLDER = "/Volumes/Samsung_T5/agi_lidar_migration/2014/temp/"
-def XTF_FOLDER = "/Volumes/Samsung_T5/agi_lidar_migration/2014/xtf/"
+def USER_HOME = System.getProperty("user.home");
+def DATA_FOLDER = USER_HOME + "/tmp/geodata/ch.so.agi.lidar_2014.contour50cm_gpkg/"
+def TEMP_FOLDER = USER_HOME + "/tmp/geodata/tmp/"
+def XTF_FOLDER = USER_HOME + "/tmp/geodata/ch.so.agi.lidar_2014.xtf/"
 def TEMPLATE_DB_FILE = Paths.get("../data/template_lidar_3D.mv.db").toFile().getAbsolutePath()
 def MODEL_NAME = "SO_AGI_Hoehenkurven_3D_Publikation_20210115"
 
 // Read (gdal) VRT file to get a list of all tif files.
-def vrt = new groovy.xml.XmlParser().parse("../data/2014/lidar_2014_dom_50cm.vrt")
+def vrt = new groovy.xml.XmlParser().parse("../data/2014/lidar_2014_dtm_50cm.vrt")
 def tiles = vrt.VRTRasterBand[0].SimpleSource.collect { it ->
     it.SourceFilename.text().reverse().drop(4).reverse()
 }
 
-//tiles = ["25941218_50cm"]
-
 for (String tile : tiles) {
-    println "Processing: $tile"
-
     if (Paths.get(XTF_FOLDER, tile + ".xtf").toFile().exists()) continue
+
+    println "Processing: $tile"
 
     try {
         new ZipFile(Paths.get(DATA_FOLDER, tile + ".zip").toFile().getAbsolutePath()).extractAll(TEMP_FOLDER);
