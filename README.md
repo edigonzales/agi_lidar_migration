@@ -6,6 +6,13 @@
 ## Links
 - https://github.com/edigonzales-archiv/av_lidar_produkte/blob/master/contour/contour.py
 
+## Abhängigkeiten
+Damit 32bit Tiff mit Deflate-Komprimierung (predictor=2) gelesen werden können, muss mindestens Geoscript Groovy >= 1.18 verwendet werden (resp. die von Gescript verwendete Geotools-Version). Momentan gibt es noch keinen Release und man muss die SNAPSHOT-Version selber kompilieren:
+
+```
+mvn clean install -DskipTests
+```
+
 ## Funktionen
 
 ### Download
