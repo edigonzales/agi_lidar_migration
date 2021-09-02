@@ -79,37 +79,17 @@ for (Feature f: tindex.features) {
 
                         if (cleanedCoords.size() > 2) {
                             LineString cleanedLine = new LineString(coords)
-
                             if (cleanedLine.numPoints > 256) {
-
-                                if (elev as int == 1190) {
-                                    println cleanedLine.wkt
-                                    println cleanedLine.numPoints
-                                }
-
                                 List<Point> points = cleanedLine.getPoints()
                                 int j=1
                                 List<Point> pointsBatch = []
                                 for (int k=0; k<points.size();k++) {
                                     Point point = points.get(k)
 
-                                    if (elev as int == 1190) {
-                                        println point.wkt
-                                        println "j="+j
-                                        println "k="+k
-                                    }
-
                                     if (cleanedLine.getEndPoint().equals(point) && k > 0) {
-                                        if (elev as int == 1190) {
-                                            println "**"+cleanedLine.getEndPoint().wkt
-                                            println "--"+point.wkt
-                                            println "should not"
-
-                                        }
                                         if (pointsBatch.size() > 1) {
                                             pointsBatch.add(point)
                                             LineString splittedLine = new LineString(pointsBatch)
-                                            //println "-----"+splittedLine
                                             pointsBatch.clear()
                                             j=1
                                             k -= 2
@@ -124,10 +104,6 @@ for (Feature f: tindex.features) {
                                     // Eigentlich 256. Aber es darf nicht ein einzelner Vertexpunkt übrigbleiben.
                                     // Damit kann keine Geometrie gemacht werden.
                                     if (j==255) {
-                                        if (elev as int == 1190) {
-                                            println "new line"
-                                        }
-
                                         LineString splittedLine = new LineString(pointsBatch)
                                         //println "*****"+splittedLine
                                         pointsBatch.clear()
@@ -142,7 +118,6 @@ for (Feature f: tindex.features) {
 
                                     pointsBatch.add(point)
                                     j++
-                                    //k++
                                 }
                             } else {
                                 //def insertSql = "INSERT INTO hoehenkurve (t_id, kote, geometrie, jahr) VALUES ($t_id, $elev, ST_LineFromText($cleanedLine.wkt), 2014)"
@@ -170,59 +145,6 @@ for (Feature f: tindex.features) {
         settingsH2.setXtffile(xtfTempFileName);
         Ili2db.run(settingsH2, null);
 
-//        // Import XTF to subdivide
-//        def pg = [url:"jdbc:postgresql://localhost:54321/edit", user:'gretl', password:'gretl', driver:'org.postgresql.Driver']
-//
-//        Config settingsPg = new Config();
-//        new PgMain().initConfig(settingsPg);
-//        settingsPg.setFunction(Config.FC_IMPORT)
-//        settingsPg.setModels(MODEL_NAME)
-//        settingsPg.setModeldir(Paths.get("../model").toFile().getAbsolutePath()+";"+"http://models.geo.admin.ch")
-//        settingsPg.setDbhost("192.168.33.1")
-//        settingsPg.setDbport("54321")
-//        settingsPg.setDbdatabase("edit")
-//        settingsPg.setDbschema("agi_hoehenkurven_2014_i")
-//        settingsPg.setDbusr(pg.user)
-//        settingsPg.setDbpwd(pg.password)
-//        settingsPg.setDburl(pg.url)
-//        settingsPg.setValidation(false);
-//        settingsPg.setItfTransferfile(false);
-//        Config.setStrokeArcs(settingsPg,Config.STROKE_ARCS_ENABLE);
-//        settingsPg.setDefaultSrsCode("2056")
-//        //def xtfFileName = Paths.get(XTF_FOLDER, tile + ".xtf").toFile().getAbsolutePath()
-//        settingsPg.setXtffile(xtfTempFileName);
-//        Ili2db.run(settingsPg, null);
-
-//        Sql.withInstance(pg.url, pg.user, pg.password, pg.driver) { sql ->
-//            sql.execute("""
-//INSERT INTO
-//    agi_hoehenkurven_2014_e.hoehenkurven_hoehenkurve
-//    (
-//        kote,
-//        geometrie,
-//        jahr
-//    )
-//    SELECT
-//        kote,
-//        ST_SubDivide(geometrie) AS geometrie,
-//        jahr
-//    FROM agi_hoehenkurven_2014_i.hoehenkurven_hoehenkurve
-//;
-//""")
-//            sql.execute("DELETE FROM agi_hoehenkurven_2014_i.hoehenkurven_hoehenkurve;")
-//        }
-//
-//        // Export subdivided XTF
-//        settingsPg.setFunction(Config.FC_EXPORT)
-//        settingsPg.setDbschema("agi_hoehenkurven_2014_e")
-//        def xtfFileName = Paths.get(XTF_FOLDER, tile + ".xtf").toFile().getAbsolutePath()
-//        settingsPg.setXtffile(xtfFileName);
-//        Ili2db.run(settingsPg, null);
-//
-//        Sql.withInstance(pg.url, pg.user, pg.password, pg.driver) { sql ->
-//            sql.execute("DELETE FROM agi_hoehenkurven_2014_e.hoehenkurven_hoehenkurve;")
-//        }
-//
 //        def xtfZipFileName = Paths.get(XTF_FOLDER, tile + ".zip")
 //        new ZipFile(xtfZipFileName.toFile().getAbsolutePath()).addFile(new File(xtfFileName))
 //
