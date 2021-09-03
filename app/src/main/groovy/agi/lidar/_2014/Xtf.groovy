@@ -146,7 +146,6 @@ for (Feature f: tindex.features) {
         def gpkgZipFileName = Paths.get(GPKG_FOLDER, tile + ".gpkg.zip")
         new ZipFile(gpkgZipFileName.toFile().getAbsolutePath()).addFile(new File(gpkgFileName))
 
-
         /*
         //Export XTF
         Config settingsH2 = new Config();
