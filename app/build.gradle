@@ -24,6 +24,7 @@ dependencies {
     implementation 'org.orbisgis:h2gis:1.5.0'
     implementation 'ch.interlis:ili2h2gis:4.4.5'
     implementation 'ch.interlis:ili2pg:4.4.5'
+    implementation 'ch.interlis:ili2gpkg:4.4.5'
     implementation 'ch.ehi:ehibasics:1.4.0' // Warum brauche ich das hier?
     implementation 'net.lingala.zip4j:zip4j:2.6.4'
     implementation 'org.codehaus.gpars:gpars:1.2.1'

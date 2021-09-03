@@ -1,5 +1,6 @@
 package agi.lidar._2014
 
+import agi.lidar.Utils
 import ch.ehi.ili2db.gui.Config
 import ch.ehi.ili2h2gis.H2gisMain
 import ch.ehi.ili2db.base.Ili2db;
@@ -28,6 +29,7 @@ def DATA_FOLDER = USER_HOME + "/tmp/geodata/ch.so.agi.lidar_2014.dtm_gpkg_tmp/"
 def TINDEX = "../data/2014/tindex.shp"
 def TEMP_FOLDER = USER_HOME + "/tmp/geodata/tmp/"
 def XTF_FOLDER = USER_HOME + "/tmp/geodata/ch.so.agi.lidar_2014.xtf/"
+def GPKG_FOLDER = USER_HOME + "/tmp/geodata/ch.so.agi.lidar_2014.gpkg/"
 def TEMPLATE_DB_FILE = Paths.get("../data/template_lidar_3D.mv.db").toFile().getAbsolutePath()
 def MODEL_NAME = "SO_AGI_Hoehenkurven_3D_Publikation_20210115"
 def YEAR = 2014
@@ -131,6 +133,21 @@ for (Feature f: tindex.features) {
             }
         }
 
+        // Export XTF
+        String xtfFileName = Paths.get(TEMP_FOLDER, tile + ".xtf").toFile().getAbsolutePath()
+        Utils.exportToXtf(new File(dbFileName).getAbsolutePath(), h2.url, xtfFileName)
+        def xtfZipFileName = Paths.get(XTF_FOLDER, tile + ".xtf.zip")
+        new ZipFile(xtfZipFileName.toFile().getAbsolutePath()).addFile(new File(xtfFileName))
+
+        // Import to GPKG
+        String gpkgFileName = Paths.get(GPKG_FOLDER, tile + ".gpkg").toFile().getAbsolutePath()
+        String dbUrl = "jdbc:sqlite:${gpkgFileName}"
+        Utils.importToGpkg(new File(gpkgFileName).getAbsolutePath(), dbUrl, xtfFileName)
+        def gpkgZipFileName = Paths.get(GPKG_FOLDER, tile + ".gpkg.zip")
+        new ZipFile(gpkgZipFileName.toFile().getAbsolutePath()).addFile(new File(gpkgFileName))
+
+
+        /*
         //Export XTF
         Config settingsH2 = new Config();
         new H2gisMain().initConfig(settingsH2);
@@ -144,9 +161,8 @@ for (Feature f: tindex.features) {
         def xtfTempFileName = Paths.get(TEMP_FOLDER, tile + "_tmp.xtf").toFile().getAbsolutePath()
         settingsH2.setXtffile(xtfTempFileName);
         Ili2db.run(settingsH2, null);
+         */
 
-//        def xtfZipFileName = Paths.get(XTF_FOLDER, tile + ".zip")
-//        new ZipFile(xtfZipFileName.toFile().getAbsolutePath()).addFile(new File(xtfFileName))
 //
 //        // Remove unnecessary files
 //        new File(TEMP_FOLDER).eachFile (FileType.FILES) { file ->
@@ -157,7 +173,7 @@ for (Feature f: tindex.features) {
 //            }
 //        }
 //
-//        workspace.close()
+        workspace.close()
 
     } catch (Exception e) {
         e.printStackTrace()
