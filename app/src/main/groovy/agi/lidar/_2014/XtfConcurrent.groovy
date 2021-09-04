@@ -31,22 +31,22 @@ def USER_HOME = System.getProperty("user.home");
 def DATA_FOLDER = USER_HOME + "/tmp/geodata/ch.so.agi.lidar_2014.dtm.gpkg_tmp/"
 def TINDEX = "../data/2014/tindex.shp"
 def TEMP_FOLDER = USER_HOME + "/tmp/geodata/tmp/"
-def XTF_FOLDER = USER_HOME + "/tmp/geodata/ch.so.agi.lidar_2014.xtf/"
-def GPKG_FOLDER = USER_HOME + "/tmp/geodata/ch.so.agi.lidar_2014.gpkg/"
-def DXF_FOLDER = USER_HOME + "/tmp/geodata/ch.so.agi.lidar_2014.dxf/"
+def XTF_FOLDER = USER_HOME + "/tmp/geodata/ch.so.agi.lidar_2014_contour1m.xtf/"
+def GPKG_FOLDER = USER_HOME + "/tmp/geodata/ch.so.agi.lidar_2014_contour1m.gpkg/"
+def DXF_FOLDER = USER_HOME + "/tmp/geodata/ch.so.agi.lidar_2014_contour1m.dxf/"
 def TEMPLATE_DB_FILE = Paths.get("../data/template_lidar_3D.mv.db").toFile().getAbsolutePath()
 def YEAR = 2014
 
 Shapefile tindex = new Shapefile(TINDEX)
-//List<Feature> features = tindex.features
-List<String> features = ["/Volumes/Samsung_T5/geodata/ch.so.agi.lidar_2014.dtm/25921228_50cm.tif"]
+List<Feature> features = tindex.features
+//List<String> features = ["/Volumes/Samsung_T5/geodata/ch.so.agi.lidar_2014.dtm/25921228_50cm.tif"]
 
-GParsPool.withPool(1) {
+GParsPool.withPool(6) {
     features.makeConcurrent()
     features.each {f ->
         try {
-            //String location = f.get("location")
-            String location = f
+            String location = f.get("location")
+            //String location = f
             String tile = location.reverse().substring(4, 17).reverse()
 
             println "Processing: $tile"
@@ -151,11 +151,14 @@ GParsPool.withPool(1) {
             def gpkgZipFileName = Paths.get(GPKG_FOLDER, tile + ".gpkg.zip")
             new ZipFile(gpkgZipFileName.toFile().getAbsolutePath()).addFile(new File(gpkgFileName))
 
+            // Export to DXF
             String dxfFileName = Paths.get(DXF_FOLDER, tile + ".dxf").toFile().getAbsolutePath()
             Gpkg2Dxf gpkg2Dxf = new Gpkg2Dxf()
             gpkg2Dxf.execute(gpkgFileName, dxfFileName)
             def dxfZipFileName = Paths.get(DXF_FOLDER, tile + ".dxf.zip")
             new ZipFile(dxfZipFileName.toFile().getAbsolutePath()).addFile(new File(dxfFileName))
+
+            tmpDir.deleteDir()
 
         } catch (Exception e) {
             e.printStackTrace()

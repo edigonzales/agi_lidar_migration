@@ -23,7 +23,7 @@ import java.nio.file.Paths
 def PERIMETER = "../data/2014/perimeter_5m.gpkg"
 def TINDEX = "../data/2014/tindex.shp"
 def DATA_FOLDER = "/Users/stefan/tmp/geodata/ch.so.agi.lidar_2014.dtm/"
-def RESULT_FOLDER = "/Users/stefan/tmp/geodata/ch.so.agi.lidar_2014.dtm_gpkg_tmp/"
+def RESULT_FOLDER = "/Users/stefan/tmp/geodata/ch.so.agi.lidar_2014.dtm.gpkg_tmp/"
 def TEMP_FOLDER = "/Users/stefan/tmp/geodata/tmp/"
 def BUFFER = 50
 def BOUNDARY_BUFFER = 5

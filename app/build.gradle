@@ -1,7 +1,7 @@
 plugins {
     id 'groovy'
     id 'application'
-    id "com.github.johnrengelman.shadow" version "7.0.0"
+    //id "com.github.johnrengelman.shadow" version "7.0.0"
 }
 
 repositories {
@@ -37,12 +37,12 @@ dependencies {
     testImplementation 'junit:junit:4.13'
 }
 
+
 configurations.all {
     resolutionStrategy {
         force 'org.xerial:sqlite-jdbc:3.36.0.3'
     }
 }
-
 
 application {
     //mainClass = 'agi.lidar.gdal.Contour'
