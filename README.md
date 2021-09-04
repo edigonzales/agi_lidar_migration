@@ -13,21 +13,6 @@ Damit 32bit Tiff mit Deflate-Komprimierung (predictor=2) gelesen werden können,
 mvn clean install -DskipTests
 ```
 
-## Datenbank
-```
-mkdir -m 0777 ~/pgdata_lidar
-
-docker run -p 54321:5432 -v ~/pgdata_lidar:/var/lib/postgresql/data:delegated -e POSTGRES_DB=edit -e POSTGRES_PASSWORD=mysecretpassword edigonzales/postgis:13-3.1
-```
-
-### Subdivide-Schemas
-```
-java -jar /Users/stefan/apps/ili2pg-4.4.5/ili2pg-4.4.5.jar --dbhost localhost --dbport 54321 --dbdatabase edit --dbusr gretl --dbpwd gretl --nameByTopic --strokeArcs --disableValidation --defaultSrsCode 2056 --createGeomIdx --models SO_AGI_Hoehenkurven_3D_Publikation_20210115 --modeldir "model/;http://models.geo.admin.ch" --dbschema agi_hoehenkurven_2014_i --schemaimport
-
-java -jar /Users/stefan/apps/ili2pg-4.4.5/ili2pg-4.4.5.jar --dbhost localhost --dbport 54321 --dbdatabase edit --dbusr gretl --dbpwd gretl --nameByTopic --strokeArcs --disableValidation --defaultSrsCode 2056 --createGeomIdx --models SO_AGI_Hoehenkurven_3D_Publikation_20210115 --modeldir "model/;http://models.geo.admin.ch" --dbschema agi_hoehenkurven_2014_e --schemaimport
-```
-
-
 ## Funktionen
 
 ### Download
@@ -42,7 +27,10 @@ Damit kachelweise gerechnet werden kann und die Höhenkurven an den Kachelgrenze
 
 Das Herstellen des Mosaic hat einen Bug, welcher dazu führt, dass die Ausdehnung (width, height) des Mosaics falsch ist. Aus diesem Grund wird die Ausdehnung selber berechnet und als Parameter der Methode übergeben.
 
-## Create XTF
+## Create XTF / GPKG / DXF
+
+- Gpkg2Dxf: Copy/Paste-Code. Vieles ist überflüssig. Frage: Etwas für iox-wkf?
+
 
 ```
 java -jar /Users/stefan/apps/ili2gpkg-4.5.0/ili2gpkg-4.5.0.jar --dbfile fubar.gpkg --disableValidation --strokeArcs --defaultSrsCode 2056 --modeldir "../../../sources/agi_lidar_migration/model;http://models.geo.admin.ch" --models SO_AGI_Hoehenkurven_3D_Publikation_20210115 --doSchemaImport --import 25921228_50cm_tmp.xtf

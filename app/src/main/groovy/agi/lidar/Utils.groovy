@@ -46,6 +46,7 @@ class Utils {
         settings.setDoImplicitSchemaImport(true)
         Config.setStrokeArcs(settings, Config.STROKE_ARCS_ENABLE)
         settings.setDefaultSrsCode("2056")
+        settings.setCreateMetaInfo(true)
         Ili2db.run(settings, null)
 
     }
