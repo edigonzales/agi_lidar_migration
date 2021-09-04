@@ -29,8 +29,6 @@ def BUFFER = 50
 def BOUNDARY_BUFFER = 5
 def PIXEL_SIZE = 0.5
 
-def list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-
 GeoPackage perimeterWs = new GeoPackage(new File(PERIMETER))
 Layer perimeter = perimeterWs.get("perimeter")
 Shapefile tindex = new Shapefile(TINDEX)
@@ -275,7 +273,6 @@ dest = mean(values);
             System.err.println(e.getMessage())
         }
     }
-    println()
 }
 
 
