@@ -52,7 +52,8 @@ GParsPool.withPool(1) {
             println "Processing: $tile"
 
             File tmpDir = Files.createTempDirectory(Paths.get(TEMP_FOLDER), "xtf").toFile()
-            new ZipFile(Paths.get(DATA_FOLDER, tile + ".zip").toFile().getAbsolutePath()).extractAll(tmpDir.getAbsolutePath());
+            // TODO: _50cm wieder entfernen.
+            new ZipFile(Paths.get(DATA_FOLDER, tile + "_50cm.zip").toFile().getAbsolutePath()).extractAll(tmpDir.getAbsolutePath());
 
             // Read features from Geopackage and insert contours into h2gis database.
             GeoPackage workspace = new GeoPackage(Paths.get(tmpDir.getAbsolutePath(), tile + ".gpkg").toFile().getAbsolutePath())
