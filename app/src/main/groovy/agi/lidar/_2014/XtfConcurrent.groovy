@@ -41,13 +41,13 @@ Shapefile tindex = new Shapefile(TINDEX)
 List<Feature> features = tindex.features
 //List<String> features = ["/Volumes/Samsung_T5/geodata/ch.so.agi.lidar_2014.dtm/25921228_50cm.tif"]
 
-GParsPool.withPool(6) {
+GParsPool.withPool(1) {
     features.makeConcurrent()
     features.each {f ->
         try {
             String location = f.get("location")
             //String location = f
-            String tile = location.reverse().substring(4, 17).reverse()
+            String tile = location.reverse().substring(9, 17).reverse()
 
             println "Processing: $tile"
 

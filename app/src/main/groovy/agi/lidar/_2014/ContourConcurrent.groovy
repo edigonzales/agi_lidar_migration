@@ -40,7 +40,7 @@ GParsPool.withPool(4) {
     features.each {
         try {
             String location = it.get("location")
-            String tile = location.reverse().substring(4, 17).reverse()
+            String tile = location.reverse().substring(9, 17).reverse()
 
             File resultFile = Paths.get(RESULT_FOLDER, tile + ".gpkg").toFile()
 
