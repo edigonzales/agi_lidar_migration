@@ -41,7 +41,7 @@ Shapefile tindex = new Shapefile(TINDEX)
 List<Feature> features = tindex.features
 //List<String> features = ["/Volumes/Samsung_T5/geodata/ch.so.agi.lidar_2014.dtm/25921228_50cm.tif"]
 
-GParsPool.withPool(1) {
+GParsPool.withPool(6) {
     features.makeConcurrent()
     features.each {f ->
         try {
@@ -56,9 +56,11 @@ GParsPool.withPool(1) {
             new ZipFile(Paths.get(DATA_FOLDER, tile + "_50cm.zip").toFile().getAbsolutePath()).extractAll(tmpDir.getAbsolutePath());
 
             // Read features from Geopackage and insert contours into h2gis database.
-            GeoPackage workspace = new GeoPackage(Paths.get(tmpDir.getAbsolutePath(), tile + ".gpkg").toFile().getAbsolutePath())
+            // TODO: _50cm wieder entfernen.
+            GeoPackage workspace = new GeoPackage(Paths.get(tmpDir.getAbsolutePath(), tile + "_50cm.gpkg").toFile().getAbsolutePath())
             println workspace.layers
-            Layer contours = workspace.get(tile)
+            // TODO: _50cm wieder entfernen.
+            Layer contours = workspace.get(tile + "_50cm")
             println "# Features in Contours = ${contours.count}"
 
             def dbFileName = Paths.get(tmpDir.getAbsolutePath(), tile + ".mv.db").toFile().getAbsolutePath()
