@@ -52,9 +52,9 @@ application {
     //mainClass = 'agi.lidar._2014.Contour'
     //mainClass = 'agi.lidar._2014.ContourConcurrent'
     //mainClass = 'agi.lidar._2014.Xtf'
-    mainClass = 'agi.lidar._2014.XtfConcurrent'
+    //mainClass = 'agi.lidar._2014.XtfConcurrent'
     //mainClass= 'agi.lidar._2014.ShadedRelief'
-    //mainClass = 'agi.lidar._2018.Download'
+    mainClass = 'agi.lidar._2018.Download'
     //mainClass = 'agi.lidar._2018.Contour'
     //mainClass = 'agi.lidar._2018.Xtf'
 }
