@@ -36,7 +36,7 @@ Shapefile tindex = new Shapefile(TINDEX)
 
 List<Feature> features = tindex.features
 
-GParsPool.withPool(3) {
+GParsPool.withPool(1) {
     features.makeConcurrent()
     features.each {
         try {
