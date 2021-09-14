@@ -36,7 +36,7 @@ Shapefile tindex = new Shapefile(TINDEX)
 
 List<Feature> features = tindex.features
 
-GParsPool.withPool(1) {
+GParsPool.withPool(2) {
     features.makeConcurrent()
     features.each {
         try {
@@ -180,6 +180,8 @@ dest = mean(values);
                     outFormatSmooth.write(outputSmooth)
                 }
             //}
+
+            System.gc()
 
             // 3. Höhenkurven
             File file = new File(Paths.get(outfile).toFile().getAbsolutePath())
