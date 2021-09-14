@@ -180,7 +180,7 @@ dest = mean(values);
                     outFormatSmooth.write(outputSmooth)
                 }
             //}
-            
+
             // 3. Höhenkurven
             File file = new File(Paths.get(outfile).toFile().getAbsolutePath())
             Format format = Format.getFormat(file)

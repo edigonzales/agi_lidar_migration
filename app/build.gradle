@@ -60,4 +60,4 @@ application {
 }
 
 //applicationDefaultJvmArgs = ["-Djava.library.path=/usr/lib/jni/", "-Djava.awt.headless=true"]
-applicationDefaultJvmArgs = ["-Djava.awt.headless=true"]
+applicationDefaultJvmArgs = ["-Djava.awt.headless=true","-Xms4096m", "-Xmx4096m"]
