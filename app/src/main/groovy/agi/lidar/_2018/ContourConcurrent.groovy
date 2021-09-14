@@ -147,15 +147,15 @@ GParsPool.withPool(2) {
                 def infile = Paths.get(tmpDir.getAbsolutePath(), "input0.tif").toFile().getAbsolutePath()
                 def outfile = Paths.get(tmpDir.getAbsolutePath(), "input5.tif").toFile().getAbsolutePath()
 
-                for (int i=0; i<5; i++) {
+            MapAlgebra algebra = new MapAlgebra()
+
+            for (int i=0; i<5; i++) {
                     String n = i as String
                     String nplus = new Integer(i+1).toString()
 
                     File file = Paths.get(tmpDir.getAbsolutePath(), "input"+n+".tif").toFile()
                     Format format = Format.getFormat(file)
                     Raster raster = format.read()
-
-                    MapAlgebra algebra = new MapAlgebra()
 
                     String script = """
 // Set option to treat locations outside the source image
@@ -180,9 +180,7 @@ dest = mean(values);
                     outFormatSmooth.write(outputSmooth)
                 }
             //}
-
-            System.gc()
-
+            
             // 3. Höhenkurven
             File file = new File(Paths.get(outfile).toFile().getAbsolutePath())
             Format format = Format.getFormat(file)
