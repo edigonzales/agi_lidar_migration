@@ -36,9 +36,10 @@ Shapefile tindex = new Shapefile(TINDEX)
 
 List<Feature> features = tindex.features
 
-GParsPool.withPool(2) {
+GParsPool.withPool(1) {
     features.makeConcurrent()
     features.each {
+        File tmpDir =  null;
         try {
             String location = it.get("location")
             String tile = location.reverse().substring(4, 19).reverse()
@@ -75,7 +76,7 @@ GParsPool.withPool(2) {
             int minYBufferFix = 0
             int maxYBufferFix = 0
 
-            File tmpDir = Files.createTempDirectory(Paths.get(TEMP_FOLDER), "contour").toFile()
+            tmpDir = Files.createTempDirectory(Paths.get(TEMP_FOLDER), "contour").toFile()
 
             List<Raster> rasters = []
             for (int i=-1; i<=1; i++) {
@@ -274,6 +275,8 @@ dest = mean(values);
             tmpDir.deleteDir()
 
         } catch (Exception e) {
+            tmpDir.deleteDir()
+
             e.printStackTrace()
             System.err.println(e.getMessage())
         }
