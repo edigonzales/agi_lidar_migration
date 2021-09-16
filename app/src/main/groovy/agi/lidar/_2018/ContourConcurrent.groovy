@@ -151,6 +151,10 @@ GParsPool.withPool(1) {
             MapAlgebra algebra = new MapAlgebra()
 
             for (int i=0; i<5; i++) {
+
+                    System.gc()
+                    Thread.sleep(2000)
+
                     String n = i as String
                     String nplus = new Integer(i+1).toString()
 
