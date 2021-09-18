@@ -46,7 +46,7 @@ GParsPool.withPool(1) {
 
             File resultFile = Paths.get(RESULT_FOLDER, tile + ".gpkg").toFile()
 
-            //if (resultFile.exists()) continue
+            if (resultFile.exists()) return
             //if (resultFile.exists()) resultFile.delete()
 
             println "Processing: ${tile}"
