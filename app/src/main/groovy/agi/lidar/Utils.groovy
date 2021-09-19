@@ -24,6 +24,7 @@ class Utils {
         new H2gisMain().initConfig(settings)
         settings.setFunction(Config.FC_EXPORT)
         settings.setModels("SO_AGI_Hoehenkurven_3D_Publikation_20210115")
+        settings.setModeldir("https://geo.so.ch/models;http://models.geo.admin.ch")
         settings.setDbfile(new File(dbFileName).getAbsolutePath())
         settings.setValidation(false)
         settings.setItfTransferfile(false)
@@ -38,6 +39,7 @@ class Utils {
         new GpkgMain().initConfig(settings)
         settings.setFunction(Config.FC_IMPORT)
         settings.setModels("SO_AGI_Hoehenkurven_3D_Publikation_20210115")
+        settings.setModeldir("https://geo.so.ch/models;http://models.geo.admin.ch")
         settings.setDbfile(new File(dbFileName).getAbsolutePath())
         settings.setValidation(false)
         settings.setItfTransferfile(false)
@@ -50,5 +52,6 @@ class Utils {
         Ili2db.run(settings, null)
 
     }
+
 
 }
