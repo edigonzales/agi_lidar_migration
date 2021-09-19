@@ -41,7 +41,7 @@ Shapefile tindex = new Shapefile(TINDEX)
 List<Feature> features = tindex.features
 //List<String> features = ["/Volumes/Samsung_T5/geodata/ch.so.agi.lidar_2014.dtm/25921228_50cm.tif"]
 
-GParsPool.withPool(1) {
+GParsPool.withPool(4) {
 
     features.makeConcurrent()
     features.each {f ->
@@ -138,9 +138,6 @@ GParsPool.withPool(1) {
             }
 
             workspace.close()
-
-            sleep(10000)
-
 
             // Export XTF
             String xtfFileName = Paths.get(tmpDir.getAbsolutePath(), tile + ".xtf").toFile().getAbsolutePath()
