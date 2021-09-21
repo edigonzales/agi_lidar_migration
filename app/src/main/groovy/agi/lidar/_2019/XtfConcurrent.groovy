@@ -46,7 +46,7 @@ GParsPool.withPool(2) {
     features.makeConcurrent()
     features.each {f ->
         try {
-            String location = f.get("location")
+            String location = f.get("link")
             //String location = f
             String tile = location.reverse().substring(4, 19).reverse()
 
