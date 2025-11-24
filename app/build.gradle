@@ -16,7 +16,7 @@ targetCompatibility = '1.8'
 
 dependencies {
     implementation 'org.codehaus.groovy:groovy-all:3.0.8'
-    implementation 'org.geoscript:geoscript-groovy:1.18-SNAPSHOT'
+    implementation 'org.geoscript:geoscript-groovy:1.18.0'
     //implementation 'org.geoscript:geoscript-groovy:1.17.0'
     //implementation 'org.codehaus.groovy:groovy-all:3.0.5'
     //implementation 'org.geoscript:geoscript-groovy:1.16.0'
@@ -59,7 +59,7 @@ application {
     //mainClass = 'agi.lidar._2018.XtfConcurrent'
     //mainClass = 'agi.lidar._2019.Download'
     //mainClass = 'agi.lidar._2019.ContourConcurrent'
-    mainClass = 'agi.lidar._2019.XtfConcurrent'
+    mainClass = 'agi.lidar._2025.ContourConcurrent'
 }
 
 //applicationDefaultJvmArgs = ["-Djava.library.path=/usr/lib/jni/", "-Djava.awt.headless=true"]
