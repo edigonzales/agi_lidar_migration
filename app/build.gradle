@@ -59,7 +59,7 @@ application {
     //mainClass = 'agi.lidar._2018.XtfConcurrent'
     //mainClass = 'agi.lidar._2019.Download'
     //mainClass = 'agi.lidar._2019.ContourConcurrent'
-    mainClass = 'agi.lidar._2025.XtfConcurrent'
+    mainClass = 'agi.lidar._2025.ContourConcurrent'
 }
 
 //applicationDefaultJvmArgs = ["-Djava.library.path=/usr/lib/jni/", "-Djava.awt.headless=true"]

@@ -21,7 +21,7 @@ import java.nio.file.Path
 import java.nio.file.Paths
 
 def USER_HOME = System.getProperty("user.home");
-def PERIMETER = "../data/2019/perimeter5m.gpkg"
+def PERIMETER = "../data/2025/perimeter5m.gpkg"
 def TINDEX = "../data/2025/tindex.shp"
 def DATA_FOLDER = USER_HOME +  "/tmp/dtm_2025/dtm/"
 def RESULT_FOLDER = USER_HOME + "/tmp/ch.so.agi.lidar_2025.dtm.gpkg_tmp/"
@@ -49,7 +49,10 @@ GParsPool.withPool(1) {
 
             File resultFile = Paths.get(RESULT_FOLDER, tileResult + ".gpkg").toFile()
 
-            if (resultFile.exists()) return
+            if(!tileResult.equalsIgnoreCase("2598000_1259000")) {
+                return
+            }
+            //if (resultFile.exists()) return
             //if (resultFile.exists()) resultFile.delete()
 
             println "Processing: ${tile}"
@@ -99,7 +102,7 @@ GParsPool.withPool(1) {
 
                     //println neighbourTile
                     File file = new File(DATA_FOLDER + neighbourTileName)
-                    println(file)
+                    //println("*****   a neighbour file: " + file)
                     // Achtung: Abhängig von den vorhandenen Daten im Verzeichnis.
                     // Und nicht etwa von einer Tileindex-Datei oder ähnlich.
                     if (!file.exists()) {
@@ -138,7 +141,7 @@ GParsPool.withPool(1) {
                     }
 
                     mosaicBounds = new Bounds(mosaicMinX, mosaicMinY, mosaicMaxX, mosaicMaxY)
-                    println("mosaicBounds: " + mosaicBounds)
+                    println("*****   mosaicBounds: " + mosaicBounds)
                 }
             }
             int width = (mosaicMaxX - mosaicMinX) / PIXEL_SIZE
@@ -191,7 +194,7 @@ foreach (dy in -2:2) {
 
 dest = mean(values);
 """
-                    println "********" + raster.coverage.renderedImage
+                    //println "*****   i="+i + " --- " + raster.coverage.renderedImage
 
                     Raster outputSmooth = algebra.calculate(script, [src:raster], outputName: "dest")
                     File outFileSmooth = Paths.get(tmpDir.getAbsolutePath(), "input"+nplus+".tif").toFile()
@@ -210,7 +213,7 @@ dest = mean(values);
             boolean simplify = false
             boolean smooth = false
             Layer contours = contourRaster.contours(band, interval, simplify, smooth)
-            println contours.features.size()
+            //println "*****   countours features size: " + contours.features.size()
 
             Workspace workspace = new Memory()
             Layer clippedContours = workspace.create(contours.schema)
@@ -218,9 +221,10 @@ dest = mean(values);
 
             Bounds bounds = new Bounds(env.getMinX(), env.getMinY(), env.getMaxX(), env.getMaxY(), "EPSG:2056")
             Schema schema = contours.schema
-            println schema
+            //println "*****   schema: " + schema
 
             contours.eachFeature { Feature feat ->
+                //println "*****   " + feat
                 // Scheint ein Bug zu sein: Falls das Intersection-Resultat
                 // ein MultiLineString ist, werden die einzelnen LineStrings
                 // miteinander verbunden.
@@ -230,6 +234,9 @@ dest = mean(values);
                 org.locationtech.jts.geom.LineString fg = feat.geom.g
                 org.locationtech.jts.geom.MultiPolygon kg = perimeter.features.get(0).geom.g
                 org.locationtech.jts.geom.Polygon bg = bounds.geometry.g
+
+                //println fg
+                //println kg 
 
                 // Erster Verschnitt ist nur noch für die Kacheln nochtwendig, die an einer Ecke an eine nicht
                 // vorhanden Kachel grenzen. Könnte man eventuell auch noch beim Raster abfangen.
@@ -244,6 +251,7 @@ dest = mean(values);
                                 value: feat.get("value"),
                                 geom: new LineString(lineString).simplify(0.01)
                         ], uuid, schema)
+                        //println "*****1   " + f
                         clippedFeatures.add(f)
                     }
                 } else if (cg instanceof org.locationtech.jts.geom.Point) {
@@ -259,6 +267,7 @@ dest = mean(values);
                                     value: feat.get("value"),
                                     geom: new LineString(lineString).simplify(0.01)
                             ], uuid, schema)
+                            //println "*****2   " + f
                             clippedFeatures.add(f)
                         } else if (g instanceof org.locationtech.jts.geom.MultiLineString) {
                             for (int l=0; l<g.numGeometries; l++) {
@@ -268,16 +277,20 @@ dest = mean(values);
                                         value: feat.get("value"),
                                         geom: new LineString(lineString).simplify(0.01)
                                 ], uuid, schema)
+                                //println "*****3   " + f
                                 clippedFeatures.add(f)
                             }
                         }
                     }
                 } else {
+                    //println "*****4   " + feat
+                    //println "*****4   " + cg
                     def uuid = UUID.randomUUID().toString()
                     Feature f = new Feature([
                             value: feat.get("value"),
                             geom: new LineString(cg).simplify(0.01)
                     ], uuid, schema)
+                    //println "*****4   " + f
                     clippedFeatures.add(f)
                 }
             }
