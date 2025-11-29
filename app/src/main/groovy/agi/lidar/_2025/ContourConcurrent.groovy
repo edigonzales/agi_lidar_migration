@@ -49,11 +49,11 @@ GParsPool.withPool(1) {
 
             File resultFile = Paths.get(RESULT_FOLDER, tileResult + ".gpkg").toFile()
 
-            if(!tileResult.equalsIgnoreCase("2598000_1259000")) {
-                return
-            }
+            // if(!tileResult.equalsIgnoreCase("2598000_1259000")) {
+            //     return
+            // }
             //if (resultFile.exists()) return
-            //if (resultFile.exists()) resultFile.delete()
+            if (resultFile.exists()) resultFile.delete()
 
             println "Processing: ${tile}"
             
